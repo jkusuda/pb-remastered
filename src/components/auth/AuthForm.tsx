@@ -1,0 +1,159 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+
+type Tab = "login" | "signup";
+
+export default function AuthForm() {
+  const [tab, setTab] = useState<Tab>("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [trainerName, setTrainerName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    if (tab === "login") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setError(error.message);
+      } else {
+        router.push("/profile");
+        router.refresh();
+      }
+    } else {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { trainer_name: trainerName } },
+      });
+      if (error) {
+        setError(error.message);
+      } else {
+        setSuccess("Check your email to confirm your account!");
+      }
+    }
+
+    setLoading(false);
+  }
+
+  async function handleGoogle() {
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border-[3px] border-[#e0e0e0] shadow-[6px_6px_0_rgba(0,0,0,0.1)] overflow-hidden">
+      {/* Tabs */}
+      <div className="flex border-b-[3px] border-[#e0e0e0]">
+        {(["login", "signup"] as Tab[]).map((t) => (
+          <button
+            key={t}
+            onClick={() => { setTab(t); setError(null); setSuccess(null); }}
+            className={`flex-1 py-4 font-['Press_Start_2P'] text-[11px] tracking-widest transition-colors ${
+              tab === t
+                ? "bg-[#d4ed7a] text-[#3a5a00]"
+                : "bg-white text-gray-400 hover:text-gray-600"
+            }`}
+          >
+            {t === "login" ? "LOGIN" : "SIGN UP"}
+          </button>
+        ))}
+      </div>
+
+      <div className="p-6 flex flex-col gap-4">
+        {/* Google OAuth */}
+        <button
+          onClick={handleGoogle}
+          disabled={loading}
+          className="flex items-center justify-center gap-3 w-full py-3 rounded-xl border-[2px] border-[#e0e0e0] bg-white font-['DM_Sans'] text-sm font-semibold text-gray-700 shadow-[3px_3px_0_rgba(0,0,0,0.07)] hover:bg-gray-50 transition-colors disabled:opacity-50"
+        >
+          <GoogleIcon />
+          Continue with Google
+        </button>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-[#e0e0e0]" />
+          <span className="font-['DM_Sans'] text-xs text-gray-400 uppercase tracking-widest">or</span>
+          <div className="flex-1 h-px bg-[#e0e0e0]" />
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          {tab === "signup" && (
+            <input
+              type="text"
+              placeholder="Trainer name"
+              value={trainerName}
+              onChange={(e) => setTrainerName(e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-xl border-[2px] border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
+            />
+          )}
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full px-4 py-3 rounded-xl border-[2px] border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full px-4 py-3 rounded-xl border-[2px] border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
+          />
+
+          {error && (
+            <p className="font-['DM_Sans'] text-xs text-red-500 text-center">{error}</p>
+          )}
+          {success && (
+            <p className="font-['DM_Sans'] text-xs text-green-600 text-center">{success}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 mt-1 font-['Press_Start_2P'] text-[11px] tracking-widest text-white bg-[#6b9fff] border-[3px] border-[#3a6fdd] rounded-xl shadow-[3px_3px_0_#2255bb] transition-all duration-75 hover:bg-[#82aeff] hover:shadow-[5px_5px_0_#2255bb] hover:-translate-x-px hover:-translate-y-px active:shadow-[1px_1px_0_#2255bb] active:translate-x-px active:translate-y-px disabled:opacity-50"
+          >
+            {loading ? "..." : tab === "login" ? "LOGIN" : "CREATE ACCOUNT"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
+      <path d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.5 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z" fill="#FFC107"/>
+      <path d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.5 6.5 29.5 4 24 4c-7.7 0-14.4 4.4-17.7 10.7z" fill="#FF3D00"/>
+      <path d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.3 35.3 26.8 36 24 36c-5.3 0-9.7-3.3-11.3-8H6.4C9.8 39.6 16.4 44 24 44z" fill="#4CAF50"/>
+      <path d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l6.2 5.2C41.4 35.6 44 30.2 44 24c0-1.2-.1-2.4-.4-3.5z" fill="#1976D2"/>
+    </svg>
+  );
+}
