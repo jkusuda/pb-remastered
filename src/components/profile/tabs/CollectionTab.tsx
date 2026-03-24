@@ -1,7 +1,7 @@
 import { Pokemon } from "@/types";
+import { PIXEL } from "@/lib/styles";
 
 const SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
-const PIXEL = "font-['Press_Start_2P']";
 
 export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
   if (pokemon.length === 0) {
@@ -15,28 +15,27 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="grid grid-cols-4 gap-3">
+    <div className="flex-1 overflow-y-auto overflow-x-hidden">
+      <div className="grid grid-cols-4 gap-1 place-items-center">
         {pokemon.map((p) => (
           <div
             key={p.id}
-            className="bg-[#c8e070]/50 rounded-xl border-[2px] border-[#3a5a00]/20 p-3 flex flex-col items-center gap-1 hover:border-[#3a5a00]/50 transition-colors"
+            className="flex flex-col items-center"
           >
             <img
               src={`${SPRITE_BASE}/${p.pokedex_number}.png`}
-              alt={`#${p.pokedex_number}`}
-              className="w-14 h-14 object-contain"
+              alt={p.nickname || `#${p.pokedex_number}`}
+              className="w-28 h-28 object-contain -mb-3 drop-shadow-md hover:scale-110 transition-transform"
               style={{ imageRendering: "pixelated" }}
             />
-            {p.is_shiny && (
-              <span className="text-[8px] font-['DM_Sans'] text-yellow-600 font-bold">✦ SHINY</span>
-            )}
             {p.nickname && (
-              <p className="font-['DM_Sans'] text-[10px] text-[#3a5a00] font-semibold truncate w-full text-center">
+              <p
+                className="font-black text-[11px] truncate w-[120%] text-center z-10"
+                style={{ color: "white", WebkitTextStroke: "0.5px black" }}
+              >
                 {p.nickname}
               </p>
             )}
-            <p className={`${PIXEL} text-[7px] text-[#4a6600]`}>#{p.pokedex_number}</p>
           </div>
         ))}
       </div>

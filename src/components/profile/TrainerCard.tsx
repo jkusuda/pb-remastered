@@ -3,65 +3,83 @@
 import { useState } from "react";
 import EditProfileModal from "./EditProfileModal";
 import { User, Pokemon } from "@/types";
-import { BORDER, PIXEL } from "@/lib/styles";
+import { BORDER } from "@/lib/styles";
 
 const TRAINER_BASE = "https://play.pokemonshowdown.com/sprites/trainers";
+const SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
 
-export default function TrainerCard({
-  user,
-  favoritePokemon,
-}: {
+const NotePenIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="2" width="14" height="18" rx="2" fill="white" stroke="black" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M7 7H13M7 11H13M7 15H9" stroke="#CBD5E1" strokeWidth="2" strokeLinecap="round" />
+    <path d="M12 14L17 9L20 12L15 17L12 14Z" fill="#F59E0B" stroke="black" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M17 9L19 7L22 10L20 12L17 9Z" fill="#EF4444" stroke="black" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M12 14L15 17L9 20L12 14Z" fill="#FDE68A" stroke="black" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M10 18L13 18L9 20Z" fill="#1F2937" />
+  </svg>
+);
+
+type Props = {
   user: User;
   favoritePokemon: Pokemon | null;
-}) {
-  const [editOpen, setEditOpen] = useState(false);
+};
 
-  const partnerName = favoritePokemon ? `#${favoritePokemon.pokedex_number}` : null;
+export default function TrainerCard({ user, favoritePokemon }: Props) {
+  const [editOpen, setEditOpen] = useState(false);
+  const level = user.level ?? 57;
 
   return (
     <>
-      <div className="h-3/5 relative p-6 flex flex-col overflow-hidden">
-        {/* Name + partner */}
-        <div className="mb-4">
-          <h1 className={`${PIXEL} text-2xl text-[#3a5a00] leading-tight truncate`}>
-            {user.trainer_name.toUpperCase()}
+      <div className={`relative bg-[#9dcd9d] rounded-[8px] border-[4px] ${BORDER} flex flex-col shadow-[4px_4px_0_black] h-full p-4`}>
+
+        {/* Title */}
+        <div className="flex justify-center mb-3 px-2">
+          <h1
+            className="font-black tracking-widest text-xl text-white uppercase text-center"
+            style={{ WebkitTextStroke: "1.5px black", textShadow: "0 2px 0 black" }}
+          >
+            {user.trainer_name}
           </h1>
-          {partnerName && (
-            <p className={`${PIXEL} text-[10px] text-[#4a6600] mt-1`}>
-              &amp; {partnerName}
-            </p>
-          )}
         </div>
 
-        {/* Avatar + art area */}
-        <div className="flex-1 relative flex items-end justify-center pb-6">
-          <div className="relative flex flex-col items-center">
-            {/* Trainer sprite — bigger, no circle container */}
+        {/* Inner card */}
+        <div className={`flex-1 bg-[#e0f4d9] rounded-[8px] border-[4px] ${BORDER} relative flex flex-col shadow-inner overflow-hidden`}>
+
+          {/* Sprites */}
+          <div className="flex-1 relative flex items-center justify-center p-4">
+            {favoritePokemon && (
+              <img
+                src={`${SPRITE_BASE}/${favoritePokemon.pokedex_number}.png`}
+                alt={`Pokemon ${favoritePokemon.pokedex_number}`}
+                className="absolute left-2 bottom-16 w-32 h-32 object-contain z-10"
+                style={{ imageRendering: "pixelated" }}
+              />
+            )}
             <img
               src={`${TRAINER_BASE}/${user.avatar_id}.png`}
               alt={`Avatar ${user.avatar_id}`}
-              className="w-72 h-72 object-contain relative z-10"
+              className="w-[18rem] h-[18rem] object-contain relative z-20 ml-8 mb-4 pointer-events-none"
               style={{ imageRendering: "pixelated" }}
-            />
-            {/* Elliptical shadow platform */}
-            <div
-              className="w-52 h-6 rounded-full -mt-4 relative z-0"
-              style={{
-                background: "radial-gradient(ellipse at center, rgba(58,90,0,0.35) 0%, rgba(58,90,0,0.12) 60%, transparent 100%)",
-              }}
             />
           </div>
 
-          {/* Edit button */}
-          <button
-            onClick={() => setEditOpen(true)}
-            className={`absolute bottom-2 right-2 w-9 h-9 rounded-full bg-[#d4ed7a] border-[2px] ${BORDER} flex items-center justify-center shadow-[2px_2px_0_rgba(0,0,0,0.12)] hover:bg-white transition-colors`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3a5a00" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-            </svg>
-          </button>
+          {/* Bottom bar — level badge + edit button */}
+          <div className="absolute bottom-4 left-4 right-4 flex items-end gap-3 z-30 pointer-events-none">
+            <div className={`flex flex-col items-center justify-center w-14 h-14 bg-white rounded-[8px] border-[4px] ${BORDER} shadow-[2px_2px_0_black] shrink-0 pointer-events-auto`}>
+              <span className="font-bold text-[9px] text-black leading-none mt-1">LEVEL</span>
+              <span className="font-black text-xl text-black leading-none mt-0.5">{level}</span>
+            </div>
+
+            <div className="flex-1" />
+
+            <button
+              onClick={() => setEditOpen(true)}
+              className={`shrink-0 mb-1 w-10 h-10 rounded-[8px] bg-[#e0f4d9] border-[3px] ${BORDER} flex items-center justify-center shadow-[2px_2px_0_black] hover:translate-y-px active:shadow-none transition-all cursor-pointer pointer-events-auto`}
+              title="Edit Profile"
+            >
+              <NotePenIcon />
+            </button>
+          </div>
         </div>
       </div>
 

@@ -44,4 +44,13 @@ export interface PokemonInfo {
   name: string;
   sprite: string;
   types: string[];
+  description: string;
+  baseStats: {
+    hp: number;
+    atk: number;
+    def: number;
+    spAtk: number;
+    spDef: number;
+    speed: number;
+  };
 }
