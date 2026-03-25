@@ -10,10 +10,11 @@ export default async function HomePage() {
   if (!authUser) redirect("/?modal=login");
 
   // Fetch all data in parallel
-  const [profileResult, pokemonResult, friendsResult] = await Promise.all([
+  const [profileResult, pokemonResult, friendsResult, pokedexResult] = await Promise.all([
     supabase.from("users").select("*").eq("id", authUser.id).single(),
     supabase.from("pokemon").select("*").eq("user_id", authUser.id).order("caught_at", { ascending: false }),
     supabase.from("friends").select(`*, friend:friend_id(trainer_name, avatar_id, level)`).eq("user_id", authUser.id),
+    supabase.from("pokedex").select("pokedex_number, unlocked_at").eq("user_id", authUser.id),
   ]);
 
   const userData = profileResult.data as User | null;
@@ -25,6 +26,7 @@ export default async function HomePage() {
 
   const pokemon = (pokemonResult.data as Pokemon[]) ?? [];
   const friends = (friendsResult.data as any[]) ?? [];
+  const pokedexUnlocks = (pokedexResult.data as any[]) ?? [];
 
   return (
     <div
@@ -33,9 +35,10 @@ export default async function HomePage() {
     >
       <div className="absolute inset-0 bg-white/20 pointer-events-none z-0 mix-blend-overlay" />
       <ProfileContent
-        initialTab="stats"
+        initialTab="collection"
         pokemon={pokemon}
         friends={friends}
+        pokedexUnlocks={pokedexUnlocks}
         user={userData}
         favoritePokemon={favoritePokemon}
       />

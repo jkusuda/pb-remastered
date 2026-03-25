@@ -12,7 +12,7 @@ import GlobalStatsPage from "./pages/GlobalStatsPage";
 import PokedexPage from "./pages/PokedexPage";
 import SettingsPage from "./pages/SettingsPage";
 
-import { User, Pokemon, Friend } from "@/types";
+import { User, Pokemon, Friend, PokedexUnlock } from "@/types";
 import { BORDER } from "@/lib/styles";
 
 type Page = "home" | "globalStats" | "pokedex" | "settings";
@@ -26,6 +26,7 @@ type Props = {
   initialTab: string;
   pokemon: Pokemon[];
   friends: FriendWithUser[];
+  pokedexUnlocks: PokedexUnlock[];
   user: User;
   favoritePokemon: Pokemon | null;
 };
@@ -41,8 +42,8 @@ function TabPanel({ children, className = "" }: { children: React.ReactNode; cla
 
 const FADE_MS = 150;
 
-export default function ProfileContent({ initialTab, pokemon, friends, user, favoritePokemon }: Props) {
-  const [activeTab, setActiveTab] = useState(VALID_TABS.has(initialTab) ? initialTab : "stats");
+export default function ProfileContent({ initialTab, pokemon, friends, pokedexUnlocks, user, favoritePokemon }: Props) {
+  const [activeTab, setActiveTab] = useState(VALID_TABS.has(initialTab) ? initialTab : "collection");
   const [activePage, setActivePage] = useState<Page>("home");
   const [fading, setFading] = useState(false);
 
@@ -106,7 +107,7 @@ export default function ProfileContent({ initialTab, pokemon, friends, user, fav
                   </h2>
                   <span className="font-bold text-sm text-black tracking-wide">{pokemon.length} / 151</span>
                 </div>
-                <div className="overflow-y-auto pr-2 custom-scrollbar flex-1">
+                <div className="flex-1 flex flex-col pr-2 min-h-0 relative">
                   <CollectionTab pokemon={pokemon} />
                 </div>
               </TabPanel>
@@ -141,7 +142,7 @@ export default function ProfileContent({ initialTab, pokemon, friends, user, fav
           <GlobalStatsPage />
         </div>
         <div style={{ display: activePage === "pokedex" ? "flex" : "none" }} className="flex-1 flex-col overflow-y-auto custom-scrollbar">
-          <PokedexPage pokemon={pokemon} />
+          <PokedexPage pokemon={pokemon} pokedexUnlocks={pokedexUnlocks} />
         </div>
         <div style={{ display: activePage === "settings" ? "flex" : "none" }} className="flex-1">
           <SettingsPage />

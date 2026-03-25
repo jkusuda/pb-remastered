@@ -38,13 +38,24 @@ export interface Candy {
   count: number;
 }
 
+// public.pokedex — unlocked species history
+export interface PokedexUnlock {
+  user_id: string;
+  pokedex_number: number;
+  unlocked_at: string;
+}
+
 // PokéAPI response shape (not stored in DB)
 export interface PokemonInfo {
   id: number;
   name: string;
   sprite: string;
+  weight: number;  // kg
+  height: number;  // m
   types: string[];
   description: string;
+  evolvesTo: number | null; // Pokédex number of next evolution, null if fully evolved
+  evolveCandyCost: number | null; // Candy needed to evolve (25 / 50 / 100), null if can't evolve
   baseStats: {
     hp: number;
     atk: number;

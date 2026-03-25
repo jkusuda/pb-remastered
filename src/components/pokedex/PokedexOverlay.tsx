@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { getPokemonSprite, getPokemonOfficialArt, getPokemonInfo } from "@/lib/pokemon";
-import { Pokemon, PokemonInfo } from "@/types";
+import { getPokedexSprite, getPokemonSprite, getPokemonInfo } from "@/lib/pokemon";
+import { Pokemon, PokemonInfo, PokedexUnlock } from "@/types";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -44,7 +44,7 @@ const STAT_COLORS: Record<string, string> = {
 };
 
 const STAT_MAX: Record<string, number> = {
-  hp: 255, atk: 165, def: 230, spAtk: 194, spDef: 230, speed: 180,
+  hp: 255, atk: 255, def: 255, spAtk: 255, spDef: 255, speed: 255,
 };
 
 // No more mock data here
@@ -99,9 +99,9 @@ function GridCell({
 
       {entry.isCaught ? (
         <img
-          src={getPokemonSprite(entry.id)}
+          src={getPokedexSprite(entry.id)}
           alt={entry.name}
-          className="w-24 h-24 object-contain mt-3"
+          className="w-36 h-36 object-contain mt-3"
           style={{ imageRendering: "pixelated" }}
         />
       ) : (
@@ -141,9 +141,9 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
 
         {entry.isCaught ? (
           <img
-            src={getPokemonOfficialArt(entry.id)}
+            src={getPokemonSprite(entry.id)}
             alt={entry.name}
-            className="relative z-10 h-36 w-36 object-contain drop-shadow-lg"
+            className="relative z-10 h-24 w-24 object-contain drop-shadow-lg"
           />
         ) : (
           <div className="relative z-10 font-['Press_Start_2P'] text-6xl text-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">?</div>
@@ -191,12 +191,6 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
                     <div className="text-[7px] font-['Press_Start_2P'] text-white/70 mb-0.5">SHINY</div>
                     <div>{entry.caughtData.is_shiny ? "✨ Yes" : "No"}</div>
                   </div>
-                  {entry.caughtData.nickname && (
-                    <div className="col-span-2">
-                      <div className="text-[7px] font-['Press_Start_2P'] text-white/70 mb-0.5">NICKNAME</div>
-                      <div>{entry.caughtData.nickname}</div>
-                    </div>
-                  )}
                 </div>
               )}
             </>
@@ -231,21 +225,19 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
       <div className="shrink-0 flex items-center justify-center gap-2 px-3 py-2 bg-[#3a96b6] border-t-4 border-[#364d4e]">
         <button
           onClick={() => setActiveTab("entry")}
-          className={`flex-1 py-1.5 rounded transition-all font-['Press_Start_2P'] text-[8px] border-2 ${
-            activeTab === "entry"
-              ? "bg-[#74eaf0] border-white text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] shadow-[0_0_8px_rgba(116,234,240,0.6)]"
-              : "bg-[#44b3c8] border-[#364d4e] text-white/70 hover:bg-[#5ecddb]"
-          }`}
+          className={`flex-1 py-1.5 rounded transition-all font-['Press_Start_2P'] text-[8px] border-2 ${activeTab === "entry"
+            ? "bg-[#74eaf0] border-white text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] shadow-[0_0_8px_rgba(116,234,240,0.6)]"
+            : "bg-[#44b3c8] border-[#364d4e] text-white/70 hover:bg-[#5ecddb]"
+            }`}
         >
           ENTRY
         </button>
         <button
           onClick={() => setActiveTab("stats")}
-          className={`flex-1 py-1.5 rounded transition-all font-['Press_Start_2P'] text-[8px] border-2 ${
-            activeTab === "stats"
-              ? "bg-[#74eaf0] border-white text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] shadow-[0_0_8px_rgba(116,234,240,0.6)]"
-              : "bg-[#44b3c8] border-[#364d4e] text-white/70 hover:bg-[#5ecddb]"
-          }`}
+          className={`flex-1 py-1.5 rounded transition-all font-['Press_Start_2P'] text-[8px] border-2 ${activeTab === "stats"
+            ? "bg-[#74eaf0] border-white text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] shadow-[0_0_8px_rgba(116,234,240,0.6)]"
+            : "bg-[#44b3c8] border-[#364d4e] text-white/70 hover:bg-[#5ecddb]"
+            }`}
         >
           STATS
         </button>
@@ -329,21 +321,26 @@ function LeftPanel({
 
 interface PokedexOverlayProps {
   pokemon?: Pokemon[];
+  pokedexUnlocks?: PokedexUnlock[];
 }
 
-export function PokedexOverlay({ pokemon = [] }: PokedexOverlayProps) {
+export function PokedexOverlay({ pokemon = [], pokedexUnlocks = [] }: PokedexOverlayProps) {
   const [selectedId, setSelectedId] = useState(1);
   const [search, setSearch] = useState("");
   const [fetchedDetails, setFetchedDetails] = useState<Record<number, PokemonInfo>>({});
 
-  const caught = pokemon.length;
+  // Use pokedex unlocks size for the total caught count if available, otherwise fallback to unique pokemon owned
+  const caught = pokedexUnlocks.length > 0
+    ? pokedexUnlocks.length
+    : new Set(pokemon.map((p) => p.pokedex_number)).size;
   const total = 151;
 
   const entries = useMemo(() => {
     return Array.from({ length: total }, (_, i) => {
       const id = i + 1;
-      const caughtRecord = pokemon.find(p => p.pokedex_number === id);
-      const isCaught = !!caughtRecord;
+      const caughtRecord = pokemon.find((p) => p.pokedex_number === id);
+      const isUnlocked = pokedexUnlocks.some((u) => u.pokedex_number === id);
+      const isCaught = isUnlocked || !!caughtRecord;
       const details = fetchedDetails[id];
 
       return {
@@ -360,9 +357,12 @@ export function PokedexOverlay({ pokemon = [] }: PokedexOverlayProps) {
         } : undefined,
       };
     });
-  }, [pokemon, fetchedDetails]);
+  }, [pokemon, pokedexUnlocks, fetchedDetails]);
 
-  // Fetch details for selected pokemon if caught and not yet fetched
+  // Fetch details for selected pokemon if caught and not yet fetched.
+  // fetchedDetails is intentionally excluded from deps: the guard inside
+  // (`!fetchedDetails[selectedId]`) prevents duplicate fetches without
+  // needing to re-run the effect every time a new entry is cached.
   useEffect(() => {
     const selectedRecord = pokemon.find(p => p.pokedex_number === selectedId);
     if (selectedRecord && !fetchedDetails[selectedId]) {
@@ -370,7 +370,8 @@ export function PokedexOverlay({ pokemon = [] }: PokedexOverlayProps) {
         .then(info => setFetchedDetails(prev => ({ ...prev, [selectedId]: info })))
         .catch(console.error);
     }
-  }, [selectedId, pokemon, fetchedDetails]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId, pokemon]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -397,16 +398,6 @@ export function PokedexOverlay({ pokemon = [] }: PokedexOverlayProps) {
         className="flex flex-col rounded-[8px] border-[4px] border-[#364d4e] shadow-[4px_4px_0_#364d4e] overflow-hidden"
         style={{ height: 560 }}   /* fixed height keeps bottom margin always visible */
       >
-        {/* ── Top bar (static) ── */}
-        <div className="shrink-0 flex items-center justify-between px-4 py-2 bg-[#3a96b6] border-b-4 border-[#364d4e]">
-          <div />
-          <div className="flex items-center gap-2 font-['Press_Start_2P'] text-[8px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
-            <span>{caught.toString().padStart(4, "0")}</span>
-            <span className="text-white/40">/</span>
-            <span>{total.toString().padStart(4, "0")}</span>
-          </div>
-        </div>
-
         {/* ── Body: left (grid) + right (detail), both static in height ── */}
         <div className="flex flex-1 min-h-0">
           <LeftPanel
