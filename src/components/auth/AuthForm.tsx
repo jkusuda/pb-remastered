@@ -29,6 +29,8 @@ export default function AuthForm() {
       if (error) {
         setError(error.message);
       } else {
+        // ExtensionAuthBridge will broadcast the session to the extension
+        // automatically via onAuthStateChange
         router.push("/profile");
         router.refresh();
       }
@@ -85,7 +87,7 @@ export default function AuthForm() {
         <button
           onClick={handleGoogle}
           disabled={loading}
-          className="flex items-center justify-center gap-3 w-full py-3 rounded-xl border-[2px] border-[#e0e0e0] bg-white font-['DM_Sans'] text-sm font-semibold text-gray-700 shadow-[3px_3px_0_rgba(0,0,0,0.07)] hover:bg-gray-50 transition-colors disabled:opacity-50"
+          className="flex items-center justify-center gap-3 w-full py-3 rounded-xl border-2 border-[#e0e0e0] bg-white font-['DM_Sans'] text-sm font-semibold text-gray-700 shadow-[3px_3px_0_rgba(0,0,0,0.07)] hover:bg-gray-50 transition-colors disabled:opacity-50"
         >
           <GoogleIcon />
           Continue with Google
@@ -107,7 +109,7 @@ export default function AuthForm() {
               value={trainerName}
               onChange={(e) => setTrainerName(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border-[2px] border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
+              className="w-full px-4 py-3 rounded-xl border-2 border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
             />
           )}
           <input
@@ -116,7 +118,7 @@ export default function AuthForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border-[2px] border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
+            className="w-full px-4 py-3 rounded-xl border-2 border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
           />
           <input
             type="password"
@@ -124,7 +126,7 @@ export default function AuthForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border-[2px] border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
+            className="w-full px-4 py-3 rounded-xl border-2 border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
           />
 
           {error && (

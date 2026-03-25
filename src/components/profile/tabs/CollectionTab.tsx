@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Pokemon, PokemonInfo } from "@/types";
 import { PIXEL } from "@/lib/styles";
 import { getPokemonSprite, getPokemonInfo } from "@/lib/pokemon";
@@ -15,7 +14,6 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; pokemon: Pokemon } | null>(null);
 
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
     const handleClick = () => setContextMenu(null);
@@ -79,15 +77,20 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
         finalNick = defaultName.charAt(0).toUpperCase() + defaultName.slice(1);
       }
 
-      const { error } = await supabase.from("pokemon").update({ nickname: finalNick }).eq("id", p.id);
+      const res = await fetch("/api/pokemon/nickname", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pokemonId: p.id, nickname: finalNick }),
+      });
 
-      if (!error) {
+      if (res.ok) {
         router.refresh();
         if (displayPokemon?.id === p.id) {
           setDisplayPokemon({ ...p, nickname: finalNick });
         }
       } else {
-        console.error("Nickname update error:", error);
+        const data = await res.json();
+        console.error("Nickname update error:", data.error);
         alert("Failed to update nickname.");
       }
     }
@@ -95,15 +98,21 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
 
   const handleRelease = async (p: Pokemon) => {
     if (window.confirm(`Are you sure you want to release ${p.nickname || `#${p.pokedex_number}`}? This cannot be undone.`)) {
-      const { error } = await supabase.from("pokemon").delete().eq("id", p.id);
-      if (!error) {
+      const res = await fetch("/api/pokemon/release", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pokemonId: p.id }),
+      });
+
+      if (res.ok) {
         router.refresh();
         if (displayPokemon?.id === p.id) {
           setIsPanelVisible(false);
           setTimeout(() => setDisplayPokemon(null), PANEL_TRANSITION_MS);
         }
       } else {
-        console.error("Release error:", error);
+        const data = await res.json();
+        console.error("Release error:", data.error);
         alert("Failed to release Pokémon.");
       }
     }
@@ -133,7 +142,7 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
               <img
                 src={getPokemonSprite(p.pokedex_number)}
                 alt={p.nickname || `#${p.pokedex_number}`}
-                className="w-20 h-20 object-contain -mb-0 drop-shadow-md hover:scale-100 transition-transform"
+                className="w-20 h-20 object-contain mb-0 drop-shadow-md hover:scale-100 transition-transform"
                 style={{ imageRendering: "pixelated" }}
               />
               {p.nickname && (

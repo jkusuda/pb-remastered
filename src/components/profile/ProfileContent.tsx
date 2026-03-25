@@ -34,7 +34,7 @@ type Props = {
 /** Shared panel shell used by Collection, Friends and Achievements tabs */
 function TabPanel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex flex-col h-full bg-[#e0f4d9]/90 rounded-[8px] border-[4px] ${BORDER} p-4 mt-2 overflow-hidden ${className}`}>
+    <div className={`flex flex-col h-full bg-[#e0f4d9]/90 rounded-[8px] border-4 ${BORDER} p-4 mt-2 overflow-hidden ${className}`}>
       {children}
     </div>
   );

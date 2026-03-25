@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ExtensionAuthBridge from "@/components/auth/ExtensionAuthBridge";
 
 export const metadata: Metadata = {
   title: "Pokebrowser",
@@ -19,7 +20,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <ExtensionAuthBridge />
+        {children}
+      </body>
     </html>
   );
 }

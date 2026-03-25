@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { getPokedexSprite, getPokemonSprite, getPokemonInfo } from "@/lib/pokemon";
 import { Pokemon, PokemonInfo, PokedexUnlock } from "@/types";
+import { TYPE_COLORS } from "@/lib/types";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -28,15 +29,6 @@ export interface PokedexEntry {
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-const TYPE_COLORS: Record<string, string> = {
-  normal: "#9B9B6F", fire: "#E8622D", water: "#4A90D9",
-  grass: "#5DBD51", electric: "#E8C633", ice: "#7CCFCE",
-  fighting: "#C03028", poison: "#9B4AC8", ground: "#D4B45A",
-  flying: "#8FA8E8", psychic: "#E85887", bug: "#8FBB2A",
-  rock: "#B8A038", ghost: "#705898", dragon: "#7038F8",
-  dark: "#705848", steel: "#B8B8D0", fairy: "#EE99AC",
-};
 
 const STAT_COLORS: Record<string, string> = {
   hp: "#FF5959", atk: "#F5AC78", def: "#FAE078",
@@ -94,7 +86,7 @@ function GridCell({
       </span>
 
       {entry.isCaught && (
-        <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 rounded-full border border-white/60 bg-gradient-to-b from-red-500 from-50% to-white to-50% z-10" />
+        <div className="absolute top-0.5 right-0.5 w-2.5 h-2.5 rounded-full border border-white/60 bg-linear-to-b from-red-500 from-50% to-white to-50% z-10" />
       )}
 
       {entry.isCaught ? (
@@ -126,7 +118,7 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
         <span className="font-['Press_Start_2P'] text-[10px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">{id}</span>
         <span className="flex-1 font-bold text-lg tracking-widest text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] uppercase">{name}</span>
         {entry.isCaught && (
-          <div className="w-5 h-5 rounded-full border-2 border-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] bg-gradient-to-b from-red-500 from-50% to-white to-50%" />
+          <div className="w-5 h-5 rounded-full border-2 border-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] bg-linear-to-b from-red-500 from-50% to-white to-50%" />
         )}
       </div>
 
@@ -274,7 +266,7 @@ function LeftPanel({
       {/* ── Static: caught counter ── */}
       <div className="shrink-0 flex items-center justify-end px-3 py-2 bg-[#3a96b6] border-b-2 border-[#364d4e]">
         <div className="flex items-center gap-1 font-['Press_Start_2P'] text-[7px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
-          <div className="w-3 h-3 rounded-full border border-white/60 bg-gradient-to-b from-red-500 from-50% to-white to-50% mr-1" />
+          <div className="w-3 h-3 rounded-full border border-white/60 bg-linear-to-b from-red-500 from-50% to-white to-50% mr-1" />
           <span>{caught.toString().padStart(4, "0")}</span>
           <span className="text-white/40 mx-1">/</span>
           <span>{total.toString().padStart(4, "0")}</span>
@@ -395,7 +387,7 @@ export function PokedexOverlay({ pokemon = [], pokedexUnlocks = [] }: PokedexOve
     <div className="w-full px-1 pt-4 pb-2">
       {/* ── Device frame ── */}
       <div
-        className="flex flex-col rounded-[8px] border-[4px] border-[#364d4e] shadow-[4px_4px_0_#364d4e] overflow-hidden"
+        className="flex flex-col rounded-[8px] border-4 border-[#364d4e] shadow-[4px_4px_0_#364d4e] overflow-hidden"
         style={{ height: 560 }}   /* fixed height keeps bottom margin always visible */
       >
         {/* ── Body: left (grid) + right (detail), both static in height ── */}

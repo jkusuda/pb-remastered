@@ -31,20 +31,21 @@ export default function EditProfileModal({ currentName, currentAvatarId, onClose
     setError(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setError("Not logged in"); return; }
+      const res = await fetch("/api/trainer/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trainerName: trainerName.trim(), avatarId }),
+      });
 
-      const { error: dbError } = await supabase
-        .from("users")
-        .update({ trainer_name: trainerName.trim(), avatar_id: avatarId })
-        .eq("id", user.id);
-
-      if (dbError) {
-        setError(dbError.message);
-      } else {
+      if (res.ok) {
         router.refresh();
         onClose();
+      } else {
+        const data = await res.json();
+        setError(data.error);
       }
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }

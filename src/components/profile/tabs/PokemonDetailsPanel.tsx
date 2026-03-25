@@ -50,7 +50,7 @@ export default function PokemonDetailsPanel({
             />
 
             {/* ── White info card ── */}
-            <div className="mx-3 mt-0 rounded-[16px] bg-white/90 shadow-sm p-3 pt-4 flex flex-col gap-2 flex-shrink-0">
+            <div className="mx-3 mt-0 rounded-[16px] bg-white/90 shadow-sm p-3 pt-4 flex flex-col gap-2 shrink-0">
               {/* Name + number */}
               <div className="text-center">
                 <h3 className="text-lg font-bold capitalize leading-tight">
@@ -111,7 +111,7 @@ export default function PokemonDetailsPanel({
             </div>
 
             {/* ── Candy row ── */}
-            <div className="mx-3 mt-1.5 rounded-[12px] bg-white/90 shadow-sm px-4 py-1.5 flex items-center justify-between flex-shrink-0">
+            <div className="mx-3 mt-1.5 rounded-[12px] bg-white/90 shadow-sm px-4 py-1.5 flex items-center justify-between shrink-0">
               <span className="font-bold text-sm capitalize">
                 {pokemonInfo?.name?.replace(/-/g, " ") ?? "Pokémon"} Candy
               </span>
@@ -120,18 +120,18 @@ export default function PokemonDetailsPanel({
 
             {/* ── Evolve button — visible if can evolve, spacer if not ── */}
             {pokemonInfo?.evolvesTo != null ? (
-              <div className="mx-3 mt-1.5 rounded-[12px] bg-[#d4edbc] shadow-sm px-4 py-1.5 flex items-center justify-between flex-shrink-0 opacity-60">
+              <div className="mx-3 mt-1.5 rounded-[12px] bg-[#d4edbc] shadow-sm px-4 py-1.5 flex items-center justify-between shrink-0 opacity-60">
                 <span className="font-bold text-sm text-[#5a8a3c] uppercase tracking-wide">Evolve</span>
-                <span className="font-bold text-sm text-[#5a8a3c]/70 bg-white/60 px-3 py-0.5 rounded-full text-xs">
+                <span className="font-bold text-[#5a8a3c]/70 bg-white/60 px-3 py-0.5 rounded-full text-xs">
                   {pokemonInfo.evolveCandyCost ?? "—"}
                 </span>
               </div>
             ) : (
-              <div className="mx-3 mt-1.5 rounded-[12px] px-4 py-4 flex-shrink-0" aria-hidden="true" />
+              <div className="mx-3 mt-1.5 rounded-[12px] px-4 py-4 shrink-0" aria-hidden="true" />
             )}
 
             {/* ── Caught On footer ── */}
-            <div className="mx-3 mt-1.5 mb-2 rounded-[12px] bg-white/70 px-4 py-2 text-center flex-shrink-0">
+            <div className="mx-3 mt-1.5 mb-2 rounded-[12px] bg-white/70 px-4 py-2 text-center shrink-0">
               <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest mb-0.5">
                 Caught On
               </p>
