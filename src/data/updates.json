@@ -1,0 +1,13 @@
+{
+  "updates": [
+    {
+      "version": "1.0.0",
+      "isNew": true,
+      "notes": [
+        "Website is now live!",
+        "Profile page implemented.",
+        "Extension remodeled."
+      ]
+    }
+  ]
+}

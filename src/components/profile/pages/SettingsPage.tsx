@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { BORDER } from "@/lib/styles";
 import settingsIcon from "@/assets/settings.webp";
 
 export default function SettingsPage() {
@@ -16,7 +15,7 @@ export default function SettingsPage() {
   return (
     <div className="flex-1 flex items-center justify-center h-full">
       <div
-        className={`bg-[#e0f4d9]/90 rounded-[8px] border-4 ${BORDER} p-12 shadow-[4px_4px_0_black] flex flex-col items-center gap-8 w-full max-w-md`}
+        className={`bg-[#e0f4d9]/90 rounded-[8px] border-4 border-black p-12 shadow-[4px_4px_0_black] flex flex-col items-center gap-8 w-full max-w-md`}
       >
         {/* Header */}
         <div className="flex flex-col items-center gap-3">

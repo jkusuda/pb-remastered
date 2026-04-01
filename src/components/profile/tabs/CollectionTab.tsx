@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Pokemon, PokemonInfo } from "@/types";
-import { PIXEL } from "@/lib/styles";
 import { getPokemonSprite, getPokemonInfo } from "@/lib/pokemon";
 import PokemonDetailsPanel from "./PokemonDetailsPanel";
 
@@ -121,7 +120,7 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
   if (pokemon.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <p className={`${PIXEL} text-[9px] text-[#3a5a00]/40 text-center leading-relaxed`}>
+        <p className={`font-black tracking-widest uppercase text-[9px] text-[#3a5a00]/40 text-center leading-relaxed`}>
           NO POKÉMON YET<br />GO CATCH SOME!
         </p>
       </div>
@@ -167,7 +166,7 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
 
       {contextMenu && (
         <div
-          className={`${PIXEL} fixed z-50 bg-[#2a2a2a] border-2 border-[#555] rounded-md shadow-xl flex flex-col p-1 w-40 drop-shadow-2xl`}
+          className={`font-black tracking-widest uppercase fixed z-50 bg-[#2a2a2a] border-2 border-[#555] rounded-md shadow-xl flex flex-col p-1 w-40 drop-shadow-2xl`}
           style={{ top: contextMenu.y, left: contextMenu.x }}
           onClick={(e) => e.stopPropagation()}
         >

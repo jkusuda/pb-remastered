@@ -22,7 +22,7 @@ export default function AuthModal() {
 
   return (
     <div
-      className="fixed inset-0 z-[300] flex items-center justify-center"
+      className="fixed inset-0 z-300 flex items-center justify-center"
       onClick={close}
     >
       {/* Backdrop */}
@@ -36,7 +36,7 @@ export default function AuthModal() {
         {/* Close button */}
         <button
           onClick={close}
-          className="absolute -top-3 -right-3 z-20 w-8 h-8 flex items-center justify-center bg-white rounded-full border-[2px] border-[#ccc] shadow-md text-gray-500 hover:text-gray-800 transition-colors"
+          className="absolute -top-3 -right-3 z-20 w-10 h-10 flex items-center justify-center bg-white rounded-full border-4 border-black shadow-[4px_4px_0_black] text-black font-black hover:translate-y-[2px] hover:shadow-[2px_2px_0_black] active:shadow-[0px_0px_0_black] active:translate-y-[4px] transition-all"
           aria-label="Close"
         >
           ✕

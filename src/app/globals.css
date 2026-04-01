@@ -1,59 +1,17 @@
 @import "tailwindcss";
 
-/* ── Landing page (non-Tailwind utilities) ──────────────────────────────────── */
-
-/* CRT scanlines — reusable across pages */
-.scanlines {
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 3px,
-      rgba(0,0,0,0.018) 3px,
-      rgba(0,0,0,0.018) 4px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 60px,
-      rgba(0,0,0,0.012) 60px,
-      rgba(0,0,0,0.012) 61px
-    );
+@theme {
+  --font-sans: var(--font-base), ui-sans-serif, system-ui, sans-serif;
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
 
-/* Floating sprites animation */
-.sprite {
-  position: absolute;
-  image-rendering: pixelated;
-  opacity: 0.55;
-  pointer-events: none;
-}
-
-.sprite-1 { width: 64px; top: -30px; left: -120px; animation: float 3.2s ease-in-out infinite; }
-.sprite-2 { width: 56px; top: 10px; right: -110px; animation: float 2.8s ease-in-out infinite 0.4s; }
-.sprite-3 { width: 52px; bottom: -20px; left: -90px; animation: float 3.5s ease-in-out infinite 0.8s; }
-.sprite-4 { width: 60px; bottom: -10px; right: -130px; animation: float 3s ease-in-out infinite 1.2s; }
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(-3deg); }
-  50% { transform: translateY(-10px) rotate(3deg); }
-}
-
-/* Title text shadow (too complex for Tailwind) */
-.title {
-  font-family: 'Press Start 2P', monospace;
-  font-size: clamp(32px, 6vw, 72px);
-  color: white;
-  letter-spacing: 0.25em;
-  line-height: 0.95;
-  text-align: center;
-  text-shadow:
-    5px 5px 0 #5a7a00,
-    -1px -1px 0 #5a7a00,
-    1px -1px 0 #5a7a00,
-    -1px 1px 0 #5a7a00,
-    8px 8px 0 rgba(0,0,0,0.12);
-  position: relative;
-  z-index: 2;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

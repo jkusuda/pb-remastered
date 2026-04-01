@@ -13,7 +13,6 @@ import PokedexPage from "./pages/PokedexPage";
 import SettingsPage from "./pages/SettingsPage";
 
 import { User, Pokemon, Friend, PokedexUnlock } from "@/types";
-import { BORDER } from "@/lib/styles";
 
 type Page = "home" | "globalStats" | "pokedex" | "settings";
 
@@ -34,7 +33,7 @@ type Props = {
 /** Shared panel shell used by Collection, Friends and Achievements tabs */
 function TabPanel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex flex-col h-full bg-[#e0f4d9]/90 rounded-[8px] border-4 ${BORDER} p-4 mt-2 overflow-hidden ${className}`}>
+    <div className={`flex flex-col h-full bg-[#e0f4d9]/90 rounded-[8px] border-4 border-black p-4 mt-2 overflow-hidden ${className}`}>
       {children}
     </div>
   );

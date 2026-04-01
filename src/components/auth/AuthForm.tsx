@@ -64,17 +64,17 @@ export default function AuthForm() {
   }
 
   return (
-    <div className="bg-white rounded-2xl border-[3px] border-[#e0e0e0] shadow-[6px_6px_0_rgba(0,0,0,0.1)] overflow-hidden">
+    <div className="bg-white rounded-[12px] border-4 border-black shadow-[8px_8px_0_black] overflow-hidden">
       {/* Tabs */}
-      <div className="flex border-b-[3px] border-[#e0e0e0]">
+      <div className="flex border-b-4 border-black">
         {(["login", "signup"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => { setTab(t); setError(null); setSuccess(null); }}
-            className={`flex-1 py-4 font-['Press_Start_2P'] text-[11px] tracking-widest transition-colors ${
+            className={`flex-1 py-4 font-black text-[13px] tracking-widest transition-colors uppercase ${
               tab === t
-                ? "bg-[#d4ed7a] text-[#3a5a00]"
-                : "bg-white text-gray-400 hover:text-gray-600"
+                ? "bg-[#9dcd9d] text-black"
+                : "bg-gray-50 text-gray-400 hover:text-black hover:bg-[#9dcd9d]/50"
             }`}
           >
             {t === "login" ? "LOGIN" : "SIGN UP"}
@@ -82,12 +82,12 @@ export default function AuthForm() {
         ))}
       </div>
 
-      <div className="p-6 flex flex-col gap-4">
+      <div className="p-6 flex flex-col gap-5">
         {/* Google OAuth */}
         <button
           onClick={handleGoogle}
           disabled={loading}
-          className="flex items-center justify-center gap-3 w-full py-3 rounded-xl border-2 border-[#e0e0e0] bg-white font-['DM_Sans'] text-sm font-semibold text-gray-700 shadow-[3px_3px_0_rgba(0,0,0,0.07)] hover:bg-gray-50 transition-colors disabled:opacity-50"
+          className="flex items-center justify-center gap-3 w-full py-3 rounded-[8px] border-4 border-black bg-white font-black text-sm text-black uppercase shadow-[4px_4px_0_black] hover:translate-y-px hover:shadow-[2px_2px_0_black] active:shadow-[0px_0px_0_black] active:translate-y-[4px] transition-all disabled:opacity-50"
         >
           <GoogleIcon />
           Continue with Google
@@ -95,13 +95,13 @@ export default function AuthForm() {
 
         {/* Divider */}
         <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-[#e0e0e0]" />
-          <span className="font-['DM_Sans'] text-xs text-gray-400 uppercase tracking-widest">or</span>
-          <div className="flex-1 h-px bg-[#e0e0e0]" />
+          <div className="flex-1 h-[4px] bg-black" />
+          <span className="font-black text-xs text-black uppercase tracking-widest">or</span>
+          <div className="flex-1 h-[4px] bg-black" />
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {tab === "signup" && (
             <input
               type="text"
@@ -109,7 +109,7 @@ export default function AuthForm() {
               value={trainerName}
               onChange={(e) => setTrainerName(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border-2 border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
+              className="w-full px-4 py-3 rounded-[8px] border-4 border-black font-bold text-sm text-black outline-none focus:border-[#9dcd9d] transition-colors"
             />
           )}
           <input
@@ -118,7 +118,7 @@ export default function AuthForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border-2 border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
+            className="w-full px-4 py-3 rounded-[8px] border-4 border-black font-bold text-sm text-black outline-none focus:border-[#9dcd9d] transition-colors"
           />
           <input
             type="password"
@@ -126,20 +126,20 @@ export default function AuthForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border-2 border-[#e0e0e0] font-['DM_Sans'] text-sm outline-none focus:border-[#6b9fff] transition-colors"
+            className="w-full px-4 py-3 rounded-[8px] border-4 border-black font-bold text-sm text-black outline-none focus:border-[#9dcd9d] transition-colors"
           />
 
           {error && (
-            <p className="font-['DM_Sans'] text-xs text-red-500 text-center">{error}</p>
+            <p className="font-bold text-xs text-red-600 text-center bg-red-100 border-2 border-red-600 p-2 rounded">{error}</p>
           )}
           {success && (
-            <p className="font-['DM_Sans'] text-xs text-green-600 text-center">{success}</p>
+            <p className="font-bold text-xs text-[#2d5a27] text-center bg-[#9dcd9d] border-2 border-[#2d5a27] p-2 rounded">{success}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 mt-1 font-['Press_Start_2P'] text-[11px] tracking-widest text-white bg-[#6b9fff] border-[3px] border-[#3a6fdd] rounded-xl shadow-[3px_3px_0_#2255bb] transition-all duration-75 hover:bg-[#82aeff] hover:shadow-[5px_5px_0_#2255bb] hover:-translate-x-px hover:-translate-y-px active:shadow-[1px_1px_0_#2255bb] active:translate-x-px active:translate-y-px disabled:opacity-50"
+            className="w-full py-3 mt-2 font-black tracking-widest text-[13px] text-black bg-[#9dcd9d] border-4 border-black rounded-[8px] shadow-[4px_4px_0_black] transition-all duration-75 hover:translate-y-[2px] hover:shadow-[2px_2px_0_black] active:shadow-[0px_0px_0_black] active:translate-y-[4px] uppercase disabled:opacity-50"
           >
             {loading ? "..." : tab === "login" ? "LOGIN" : "CREATE ACCOUNT"}
           </button>

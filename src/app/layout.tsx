@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import ExtensionAuthBridge from "@/components/auth/ExtensionAuthBridge";
+
+const baseFont = Outfit({ 
+  subsets: ["latin"], 
+  display: 'swap', 
+  variable: '--font-base' 
+});
 
 export const metadata: Metadata = {
   title: "Pokebrowser",
@@ -15,12 +22,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
       </head>
-      <body className="antialiased">
+      <body className={`${baseFont.variable} font-sans antialiased text-black`}>
         <ExtensionAuthBridge />
         {children}
       </body>

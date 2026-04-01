@@ -2,10 +2,14 @@
 
 import { Suspense } from "react";
 import AuthForm from "@/components/auth/AuthForm";
+import loginbg from "@/assets/loginbackground.gif";
 
 function LoginContent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#d4ed7a] p-4">
+    <div
+      className="flex min-h-screen items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${loginbg.src})` }}
+    >
       <div className="w-full max-w-md">
         <AuthForm />
       </div>
@@ -15,7 +19,16 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#d4ed7a] p-4">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div
+          className="flex min-h-screen items-center justify-center p-4 font-black tracking-widest text-white uppercase bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${loginbg.src})`, WebkitTextStroke: "1px black" }}
+        >
+          Loading...
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   );

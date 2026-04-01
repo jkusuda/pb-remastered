@@ -1,16 +1,15 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;500;600;700;800;900&display=swap");
 
 /* ── Base ─────────────────────────────────────────────────────────────── */
 
 body {
   width: 320px;
-  height: 420px;
+  height: 340px;
   margin: 0;
   padding: 0;
   overflow: hidden;
   font-family: "DM Sans", sans-serif;
-  background: #9DCD9D;
 }
 
 #root {
@@ -18,7 +17,7 @@ body {
   height: 100%;
 }
 
-/* ── Popup Layout ─────────────────────────────────────────────────────── */
+/* ── Logged-out state ─────────────────────────────────────────────────── */
 
 .popup-container {
   width: 100%;
@@ -28,28 +27,21 @@ body {
   justify-content: center;
   padding: 20px;
   box-sizing: border-box;
-  background:
-    repeating-linear-gradient(0deg,
-      transparent,
-      transparent 3px,
-      rgba(0, 0, 0, 0.015) 3px,
-      rgba(0, 0, 0, 0.015) 4px);
+  background: #9dcd9d;
 }
 
 .popup-card {
   width: 100%;
   background: white;
-  border: 3px solid #e0e0e0;
+  border: 3px solid #b8ddb8;
   border-radius: 16px;
   padding: 28px 24px;
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
 }
-
-/* ── Pokeball Icon ────────────────────────────────────────────────────── */
 
 .pokeball-icon {
   opacity: 0.6;
@@ -57,18 +49,9 @@ body {
 }
 
 @keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0px) rotate(-2deg);
-  }
-
-  50% {
-    transform: translateY(-6px) rotate(2deg);
-  }
+  0%, 100% { transform: translateY(0px) rotate(-2deg); }
+  50%       { transform: translateY(-6px) rotate(2deg); }
 }
-
-/* ── Typography ───────────────────────────────────────────────────────── */
 
 .popup-title {
   font-family: "Press Start 2P", monospace;
@@ -80,10 +63,6 @@ body {
   margin: 0;
 }
 
-.popup-title--sm {
-  font-size: 14px;
-}
-
 .popup-subtitle {
   font-family: "DM Sans", sans-serif;
   font-size: 13px;
@@ -91,44 +70,6 @@ body {
   margin: -8px 0 4px;
   font-weight: 500;
 }
-
-/* ── User Info ────────────────────────────────────────────────────────── */
-
-.user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 0;
-}
-
-.user-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #6b9fff, #3a6fdd);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "Press Start 2P", monospace;
-  font-size: 18px;
-  color: white;
-  border: 3px solid #e0e0e0;
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.08);
-}
-
-.user-email {
-  font-size: 12px;
-  color: #555;
-  font-weight: 600;
-  margin: 0;
-  max-width: 220px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ── Buttons ──────────────────────────────────────────────────────────── */
 
 .btn-primary {
   width: 100%;
@@ -156,68 +97,36 @@ body {
   transform: translate(1px, 1px);
 }
 
-.btn-group {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-}
-
-.btn-secondary,
-.btn-danger {
-  flex: 1;
-  padding: 10px 0;
-  font-family: "DM Sans", sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 10px;
-  border: 2px solid #e0e0e0;
-  cursor: pointer;
-  transition: all 75ms;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.06);
-}
-
-.btn-secondary {
-  background: white;
-  color: #555;
-}
-
-.btn-secondary:hover {
-  background: #f5f5f5;
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.08);
-  transform: translate(-1px, -1px);
-}
-
-.btn-danger {
-  background: #fff0f0;
-  color: #d44;
-  border-color: #fcc;
-}
-
-.btn-danger:hover {
-  background: #ffe0e0;
-  box-shadow: 3px 3px 0 rgba(200, 0, 0, 0.08);
-  transform: translate(-1px, -1px);
-}
-
-.btn-secondary:active,
-.btn-danger:active {
-  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.06);
-  transform: translate(1px, 1px);
-}
-
 /* ── Spinner ──────────────────────────────────────────────────────────── */
 
 .spinner {
   width: 24px;
   height: 24px;
-  border: 3px solid #e0e0e0;
+  border: 3px solid rgba(0, 0, 0, 0.12);
   border-top-color: #6b9fff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Custom scrollbar (matches website) ───────────────────────────────── */
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
 }

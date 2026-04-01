@@ -1,6 +1,5 @@
 "use client";
 
-import { BORDER } from "@/lib/styles";
 import pokeballIcon from "@/assets/pokeball.png";
 import friendsIcon from "@/assets/friends.png";
 import awardsIcon from "@/assets/awards.png";
@@ -8,15 +7,14 @@ import statsIcon from "@/assets/stats.png";
 
 // Static — defined outside component to avoid recreation on every render
 const NAV_ITEMS = [
-  { label: "COLLECTION",  tab: "collection",  icon: pokeballIcon.src },
-  { label: "FRIENDS",     tab: "friends",     icon: friendsIcon.src },
-  { label: "ACHIEVEMENTS",tab: "achievements", icon: awardsIcon.src },
-  { label: "STATS",       tab: "stats",       icon: statsIcon.src },
+  { label: "COLLECTION", tab: "collection", icon: pokeballIcon.src },
+  { label: "FRIENDS", tab: "friends", icon: friendsIcon.src },
+  { label: "ACHIEVEMENTS", tab: "achievements", icon: awardsIcon.src },
+  { label: "STATS", tab: "stats", icon: statsIcon.src },
 ];
 
 const btnClass = (isActive: boolean) =>
-  `flex-1 flex flex-col items-center justify-center py-5 px-4 rounded-[8px] border-[4px] ${BORDER} shadow-[4px_4px_0_black] transition-transform hover:-translate-y-1 hover:bg-[#8abf8a] active:translate-y-1 active:shadow-[1px_1px_0_black] ${
-    isActive ? "bg-[#8abf8a]" : "bg-[#9dcd9d]"
+  `flex-1 flex flex-col items-center justify-center py-5 px-4 rounded-[8px] border-[4px] border-black shadow-[4px_4px_0_black] transition-transform hover:-translate-y-1 hover:bg-[#8abf8a] active:translate-y-1 active:shadow-[1px_1px_0_black] ${isActive ? "bg-[#8abf8a]" : "bg-[#9dcd9d]"
   }`;
 
 type Props = {
@@ -26,7 +24,7 @@ type Props = {
 
 export default function ProfileBottomNav({ activeTab, onTabChange }: Props) {
   return (
-    <div className={`mt-4 w-full bg-[#9dcd9d] border-[4px] ${BORDER} rounded-[8px] p-4 flex gap-5 shadow-[4px_4px_0_black]`}>
+    <div className={`mt-4 w-full bg-[#9dcd9d] border-4 border-black rounded-[8px] p-4 flex gap-5 shadow-[4px_4px_0_black]`}>
       {NAV_ITEMS.map((item) => (
         <button
           key={item.tab}

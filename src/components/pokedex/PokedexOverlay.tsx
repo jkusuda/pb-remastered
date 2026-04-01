@@ -49,7 +49,7 @@ function StatBar({ label, value, statKey }: { label: string; value: number; stat
   const color = STAT_COLORS[statKey] ?? "#aaa";
   return (
     <div className="flex items-center gap-2 text-xs">
-      <span className="w-12 shrink-0 font-bold text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] font-['Press_Start_2P'] text-[7px] leading-none">
+      <span className="w-12 shrink-0 text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] font-black tracking-widest uppercase text-[7px] leading-none">
         {label}
       </span>
       <span className="w-6 shrink-0 text-right text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] font-mono text-[10px]">{value}</span>
@@ -81,7 +81,7 @@ function GridCell({
         : "border-[#84feff]/60 bg-[#5ecddb]/80 hover:border-[#84feff]/80 hover:bg-[#77ecf1]/80"
         }`}
     >
-      <span className="absolute top-0.5 left-1 font-['Press_Start_2P'] text-[12px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] leading-none z-10">
+      <span className="absolute top-0.5 left-1 font-black tracking-widest uppercase text-[12px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] leading-none z-10">
         {id}
       </span>
 
@@ -98,7 +98,7 @@ function GridCell({
         />
       ) : (
         <div className="flex items-center justify-center mt-3 w-32 h-32">
-          <span className="font-['Press_Start_2P'] text-lg text-white/30 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">?</span>
+          <span className="font-black tracking-widest uppercase text-lg text-white/30 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">?</span>
         </div>
       )}
     </button>
@@ -115,7 +115,7 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
     <div className="flex flex-col h-full bg-[#3a96b6]">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-2.5 bg-[#74eaf0] border-b-4 border-[#3a96b6] shrink-0">
-        <span className="font-['Press_Start_2P'] text-[10px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">{id}</span>
+        <span className="font-black tracking-widest uppercase text-[10px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">{id}</span>
         <span className="flex-1 font-bold text-lg tracking-widest text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] uppercase">{name}</span>
         {entry.isCaught && (
           <div className="w-5 h-5 rounded-full border-2 border-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] bg-linear-to-b from-red-500 from-50% to-white to-50%" />
@@ -138,7 +138,7 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
             className="relative z-10 h-24 w-24 object-contain drop-shadow-lg"
           />
         ) : (
-          <div className="relative z-10 font-['Press_Start_2P'] text-6xl text-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">?</div>
+          <div className="relative z-10 font-black tracking-widest uppercase text-6xl text-white/20 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">?</div>
         )}
 
         {entry.isCaught && entry.types && (
@@ -146,7 +146,7 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
             {entry.types.map((t) => (
               <span
                 key={t}
-                className="text-[8px] font-bold text-white uppercase px-2 py-0.5 rounded font-['Press_Start_2P'] leading-none shadow border border-white/20"
+                className="text-[8px] text-white px-2 py-0.5 rounded font-black tracking-widest uppercase leading-none shadow border border-white/20"
                 style={{ backgroundColor: TYPE_COLORS[t] ?? "#666" }}
               >
                 {t}
@@ -161,7 +161,7 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
         {activeTab === "stats" ? (
           entry.isCaught && entry.baseStats ? (
             <>
-              <div className="font-['Press_Start_2P'] text-[8px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] mb-3 tracking-widest uppercase">
+              <div className="font-black tracking-widest uppercase text-[8px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] mb-3">
                 Base Stats
               </div>
               <div className="flex flex-col gap-2.5">
@@ -176,11 +176,11 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
               {entry.caughtData && (
                 <div className="mt-3 pt-3 border-t border-[#364d4e] grid grid-cols-2 gap-2 text-[9px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
                   <div>
-                    <div className="text-[7px] font-['Press_Start_2P'] text-white/70 mb-0.5">CAUGHT</div>
+                    <div className="text-[7px] font-black tracking-widest uppercase text-white/70 mb-0.5">CAUGHT</div>
                     <div>{new Date(entry.caughtData.caught_at).toLocaleDateString()}</div>
                   </div>
                   <div>
-                    <div className="text-[7px] font-['Press_Start_2P'] text-white/70 mb-0.5">SHINY</div>
+                    <div className="text-[7px] font-black tracking-widest uppercase text-white/70 mb-0.5">SHINY</div>
                     <div>{entry.caughtData.is_shiny ? "✨ Yes" : "No"}</div>
                   </div>
                 </div>
@@ -188,7 +188,7 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
             </>
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-2 opacity-40">
-              <div className="font-['Press_Start_2P'] text-[9px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">DATA UNKNOWN</div>
+              <div className="font-black tracking-widest uppercase text-[9px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">DATA UNKNOWN</div>
               <div className="text-xs text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] text-center">
                 Catch this Pokémon to reveal its data
               </div>
@@ -198,12 +198,12 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
           /* Entry View */
           <div className="flex flex-col items-center justify-center h-full gap-2">
             {entry.isCaught ? (
-              <div className="text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] font-['Press_Start_2P'] text-[8px] leading-relaxed text-center px-2">
+              <div className="text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] font-black tracking-widest uppercase text-[8px] leading-relaxed text-center px-2">
                 {entry.description || "Loading description..."}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full gap-2 opacity-40">
-                <div className="font-['Press_Start_2P'] text-[9px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">DATA UNKNOWN</div>
+                <div className="font-black tracking-widest uppercase text-[9px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">DATA UNKNOWN</div>
                 <div className="text-xs text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] text-center">
                   Catch this Pokémon to reveal its data
                 </div>
@@ -217,7 +217,7 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
       <div className="shrink-0 flex items-center justify-center gap-2 px-3 py-2 bg-[#3a96b6] border-t-4 border-[#364d4e]">
         <button
           onClick={() => setActiveTab("entry")}
-          className={`flex-1 py-1.5 rounded transition-all font-['Press_Start_2P'] text-[8px] border-2 ${activeTab === "entry"
+          className={`flex-1 py-1.5 rounded transition-all font-black tracking-widest uppercase text-[8px] border-2 ${activeTab === "entry"
             ? "bg-[#74eaf0] border-white text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] shadow-[0_0_8px_rgba(116,234,240,0.6)]"
             : "bg-[#44b3c8] border-[#364d4e] text-white/70 hover:bg-[#5ecddb]"
             }`}
@@ -226,7 +226,7 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
         </button>
         <button
           onClick={() => setActiveTab("stats")}
-          className={`flex-1 py-1.5 rounded transition-all font-['Press_Start_2P'] text-[8px] border-2 ${activeTab === "stats"
+          className={`flex-1 py-1.5 rounded transition-all font-black tracking-widest uppercase text-[8px] border-2 ${activeTab === "stats"
             ? "bg-[#74eaf0] border-white text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] shadow-[0_0_8px_rgba(116,234,240,0.6)]"
             : "bg-[#44b3c8] border-[#364d4e] text-white/70 hover:bg-[#5ecddb]"
             }`}
@@ -265,7 +265,7 @@ function LeftPanel({
 
       {/* ── Static: caught counter ── */}
       <div className="shrink-0 flex items-center justify-end px-3 py-2 bg-[#3a96b6] border-b-2 border-[#364d4e]">
-        <div className="flex items-center gap-1 font-['Press_Start_2P'] text-[7px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center gap-1 font-black tracking-widest uppercase text-[7px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
           <div className="w-3 h-3 rounded-full border border-white/60 bg-linear-to-b from-red-500 from-50% to-white to-50% mr-1" />
           <span>{caught.toString().padStart(4, "0")}</span>
           <span className="text-white/40 mx-1">/</span>
@@ -300,7 +300,7 @@ function LeftPanel({
           ))}
         </div>
         {filtered.length === 0 && (
-          <div className="flex items-center justify-center h-32 font-['Press_Start_2P'] text-[9px] text-white/40">
+          <div className="flex items-center justify-center h-32 font-black tracking-widest uppercase text-[9px] text-white/40">
             NO RESULTS
           </div>
         )}

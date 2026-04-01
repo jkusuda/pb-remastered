@@ -3,7 +3,6 @@
 import { useState } from "react";
 import EditProfileModal from "./EditProfileModal";
 import { User, Pokemon } from "@/types";
-import { BORDER } from "@/lib/styles";
 
 const TRAINER_BASE = "https://play.pokemonshowdown.com/sprites/trainers";
 const SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
@@ -30,7 +29,7 @@ export default function TrainerCard({ user, favoritePokemon }: Props) {
 
   return (
     <>
-      <div className={`relative bg-[#9dcd9d] rounded-[8px] border-4 ${BORDER} flex flex-col shadow-[4px_4px_0_black] h-full p-4`}>
+      <div className={`relative bg-[#9dcd9d] rounded-[8px] border-4 border-black flex flex-col shadow-[4px_4px_0_black] h-full p-4`}>
 
         {/* Title */}
         <div className="flex justify-center mb-3 px-2">
@@ -43,7 +42,7 @@ export default function TrainerCard({ user, favoritePokemon }: Props) {
         </div>
 
         {/* Inner card */}
-        <div className={`flex-1 bg-[#e0f4d9] rounded-[8px] border-4 ${BORDER} relative flex flex-col shadow-inner overflow-hidden`}>
+        <div className={`flex-1 bg-[#e0f4d9] rounded-[8px] border-4 border-black relative flex flex-col shadow-inner overflow-hidden`}>
 
           {/* Sprites */}
           <div className="flex-1 relative flex items-center justify-center p-4">
@@ -65,7 +64,7 @@ export default function TrainerCard({ user, favoritePokemon }: Props) {
 
           {/* Bottom bar — level badge + edit button */}
           <div className="absolute bottom-4 left-4 right-4 flex items-end gap-3 z-30 pointer-events-none">
-            <div className={`flex flex-col items-center justify-center w-14 h-14 bg-white rounded-[8px] border-4 ${BORDER} shadow-[2px_2px_0_black] shrink-0 pointer-events-auto`}>
+            <div className={`flex flex-col items-center justify-center w-14 h-14 bg-white rounded-[8px] border-4 border-black shadow-[2px_2px_0_black] shrink-0 pointer-events-auto`}>
               <span className="font-bold text-[9px] text-black leading-none mt-1">LEVEL</span>
               <span className="font-black text-xl text-black leading-none mt-0.5">{level}</span>
             </div>
@@ -74,7 +73,7 @@ export default function TrainerCard({ user, favoritePokemon }: Props) {
 
             <button
               onClick={() => setEditOpen(true)}
-              className={`shrink-0 mb-1 w-10 h-10 rounded-[8px] bg-[#e0f4d9] border-[3px] ${BORDER} flex items-center justify-center shadow-[2px_2px_0_black] hover:translate-y-px active:shadow-none transition-all cursor-pointer pointer-events-auto`}
+              className={`shrink-0 mb-1 w-10 h-10 rounded-[8px] bg-[#e0f4d9] border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0_black] hover:translate-y-px active:shadow-none transition-all cursor-pointer pointer-events-auto`}
               title="Edit Profile"
             >
               <NotePenIcon />
