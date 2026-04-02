@@ -29,8 +29,6 @@ export default function AuthForm() {
       if (error) {
         setError(error.message);
       } else {
-        // ExtensionAuthBridge will broadcast the session to the extension
-        // automatically via onAuthStateChange
         router.push("/profile");
         router.refresh();
       }

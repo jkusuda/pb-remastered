@@ -3,9 +3,9 @@
 import { useState } from "react";
 import EditProfileModal from "./EditProfileModal";
 import { User, Pokemon } from "@/types";
+import { TRAINER_BASE } from "@/lib/pokemon";
 
-const TRAINER_BASE = "https://play.pokemonshowdown.com/sprites/trainers";
-const SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
+const SPRITE_BASE = "https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon";
 
 const NotePenIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -69,7 +69,18 @@ export default function TrainerCard({ user, favoritePokemon }: Props) {
               <span className="font-black text-xl text-black leading-none mt-0.5">{level}</span>
             </div>
 
-            <div className="flex-1" />
+            <div className="flex flex-col justify-center px-1 h-14 flex-1 pointer-events-auto mt-1">
+              <div className="flex justify-between items-end mb-1">
+                <span className="font-black tracking-widest text-[10px] text-black leading-none uppercase">EXP</span>
+                <span className="font-black tracking-widest text-[10px] text-black leading-none">{user.xp} / {level * 1000}</span>
+              </div>
+              <div className="w-full h-4 bg-white border-[3px] border-black rounded-full overflow-hidden shadow-[2px_2px_0_rgba(0,0,0,0.5)]">
+                <div
+                  className="h-full bg-[#48bb78]"
+                  style={{ width: `${Math.min(100, Math.max(0, (user.xp / (level * 1000)) * 100))}%` }}
+                />
+              </div>
+            </div>
 
             <button
               onClick={() => setEditOpen(true)}

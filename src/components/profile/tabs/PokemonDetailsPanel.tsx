@@ -1,12 +1,13 @@
-import { Pokemon, PokemonInfo } from "@/types";
+import { Pokemon, PokemonInfo, Candy } from "@/types";
 import { getPokemonSprite } from "@/lib/pokemon";
-
+import { getFamilyId } from "pokemon-data";
 import { getTypeColor, getTypeIconPath } from "@/lib/types";
 
-// ─── Props ──────────────────────────────────────────────────────────────────
 interface PokemonDetailsPanelProps {
   pokemon: Pokemon | null;
   pokemonInfo: PokemonInfo | null;
+  familyInfo: PokemonInfo | null;
+  candies: Candy[];
   isVisible: boolean;
   onClose: () => void;
 }
@@ -14,6 +15,8 @@ interface PokemonDetailsPanelProps {
 export default function PokemonDetailsPanel({
   pokemon,
   pokemonInfo,
+  familyInfo,
+  candies,
   isVisible,
   onClose,
 }: PokemonDetailsPanelProps) {
@@ -29,7 +32,7 @@ export default function PokemonDetailsPanel({
     >
       {pokemon && (
         <div className="flex flex-col h-full relative">
-          {/* ── Close button ── */}
+          {/* Close button */}
           <button
             onClick={onClose}
             className="absolute top-2 right-3 text-white/70 hover:text-white text-xl font-bold z-30"
@@ -37,10 +40,10 @@ export default function PokemonDetailsPanel({
             &times;
           </button>
 
-          {/* ── Spacer to push everything to bottom ── */}
+          {/* Spacer */}
           <div className="flex-1" />
 
-          {/* ── Sprite — positioned relative to the content below ── */}
+          {/* Sprite + info card */}
           <div className="relative">
             <img
               src={getPokemonSprite(pokemon.pokedex_number)}
@@ -49,7 +52,7 @@ export default function PokemonDetailsPanel({
               style={{ imageRendering: "pixelated" }}
             />
 
-            {/* ── White info card ── */}
+            {/* White info card */}
             <div className="mx-3 mt-0 rounded-[16px] bg-white/90 shadow-sm p-3 pt-4 flex flex-col gap-2 shrink-0">
               {/* Name + number */}
               <div className="text-center">
@@ -63,7 +66,6 @@ export default function PokemonDetailsPanel({
 
               {/* Weight | Types | Height row */}
               <div className="flex items-center justify-between text-center text-[11px] gap-1">
-                {/* Weight */}
                 <div className="flex-1">
                   <p className="font-bold text-sm">
                     {pokemonInfo ? `${pokemonInfo.weight}kg` : "—"}
@@ -73,7 +75,6 @@ export default function PokemonDetailsPanel({
 
                 <div className="w-px h-8 bg-gray-200" />
 
-                {/* Types */}
                 <div className="flex-1 flex flex-col items-center gap-1">
                   <div className="flex gap-1 justify-center">
                     {types.length > 0 ? types.map((t) => (
@@ -100,7 +101,6 @@ export default function PokemonDetailsPanel({
 
                 <div className="w-px h-8 bg-gray-200" />
 
-                {/* Height */}
                 <div className="flex-1">
                   <p className="font-bold text-sm">
                     {pokemonInfo ? `${pokemonInfo.height}m` : "—"}
@@ -110,15 +110,17 @@ export default function PokemonDetailsPanel({
               </div>
             </div>
 
-            {/* ── Candy row ── */}
+            {/* Candy row */}
             <div className="mx-3 mt-1.5 rounded-[12px] bg-white/90 shadow-sm px-4 py-1.5 flex items-center justify-between shrink-0">
               <span className="font-bold text-sm capitalize">
-                {pokemonInfo?.name?.replace(/-/g, " ") ?? "Pokémon"} Candy
+                {familyInfo?.name?.replace(/-/g, " ") ?? pokemonInfo?.name?.replace(/-/g, " ") ?? "Pokémon"} Candy
               </span>
-              <span className="font-bold text-sm text-gray-600">—</span>
+              <span className="font-bold text-sm text-gray-600">
+                {pokemon ? (candies?.find(c => c.pokedex_number === getFamilyId(pokemon.pokedex_number))?.count ?? 0) : "—"}
+              </span>
             </div>
 
-            {/* ── Evolve button — visible if can evolve, spacer if not ── */}
+            {/* Evolve button */}
             {pokemonInfo?.evolvesTo != null ? (
               <div className="mx-3 mt-1.5 rounded-[12px] bg-[#d4edbc] shadow-sm px-4 py-1.5 flex items-center justify-between shrink-0 opacity-60">
                 <span className="font-bold text-sm text-[#5a8a3c] uppercase tracking-wide">Evolve</span>
@@ -130,7 +132,7 @@ export default function PokemonDetailsPanel({
               <div className="mx-3 mt-1.5 rounded-[12px] px-4 py-4 shrink-0" aria-hidden="true" />
             )}
 
-            {/* ── Caught On footer ── */}
+            {/* Caught On footer */}
             <div className="mx-3 mt-1.5 mb-2 rounded-[12px] bg-white/70 px-4 py-2 text-center shrink-0">
               <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest mb-0.5">
                 Caught On

@@ -1,12 +1,13 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { User, Pokemon, Friend, PokedexUnlock } from "@/types";
+import { User, Pokemon, Friend, PokedexUnlock, Candy } from "@/types";
 
 export async function getTrainerData(supabase: SupabaseClient, userId: string) {
-  const [profileResult, pokemonResult, friendsResult, pokedexResult] = await Promise.all([
+  const [profileResult, pokemonResult, friendsResult, pokedexResult, candiesResult] = await Promise.all([
     supabase.from("users").select("*").eq("id", userId).single(),
     supabase.from("pokemon").select("*").eq("user_id", userId).order("caught_at", { ascending: false }),
     supabase.from("friends").select(`*, friend:friend_id(trainer_name, avatar_id, level)`).eq("user_id", userId),
     supabase.from("pokedex").select("pokedex_number, unlocked_at").eq("user_id", userId),
+    supabase.from("candies").select("*").eq("user_id", userId),
   ]);
 
   if (profileResult.error) throw profileResult.error;
@@ -22,6 +23,7 @@ export async function getTrainerData(supabase: SupabaseClient, userId: string) {
     friends: (friendsResult.data as any[]) ?? [],
     pokedexUnlocks: (pokedexResult.data as PokedexUnlock[]) ?? [],
     favoritePokemon,
+    candies: (candiesResult.data as Candy[]) ?? [],
   };
 }
 

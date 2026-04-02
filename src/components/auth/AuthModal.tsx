@@ -11,7 +11,6 @@ export default function AuthModal() {
     router.push("/");
   }
 
-  // Close on Escape key
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") close();

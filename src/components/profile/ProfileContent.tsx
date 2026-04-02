@@ -12,7 +12,7 @@ import GlobalStatsPage from "./pages/GlobalStatsPage";
 import PokedexPage from "./pages/PokedexPage";
 import SettingsPage from "./pages/SettingsPage";
 
-import { User, Pokemon, Friend, PokedexUnlock } from "@/types";
+import { User, Pokemon, Friend, PokedexUnlock, Candy } from "@/types";
 
 type Page = "home" | "globalStats" | "pokedex" | "settings";
 
@@ -28,6 +28,7 @@ type Props = {
   pokedexUnlocks: PokedexUnlock[];
   user: User;
   favoritePokemon: Pokemon | null;
+  candies: Candy[];
 };
 
 /** Shared panel shell used by Collection, Friends and Achievements tabs */
@@ -41,7 +42,7 @@ function TabPanel({ children, className = "" }: { children: React.ReactNode; cla
 
 const FADE_MS = 150;
 
-export default function ProfileContent({ initialTab, pokemon, friends, pokedexUnlocks, user, favoritePokemon }: Props) {
+export default function ProfileContent({ initialTab, pokemon, friends, pokedexUnlocks, user, favoritePokemon, candies }: Props) {
   const [activeTab, setActiveTab] = useState(VALID_TABS.has(initialTab) ? initialTab : "collection");
   const [activePage, setActivePage] = useState<Page>("home");
   const [fading, setFading] = useState(false);
@@ -104,10 +105,10 @@ export default function ProfileContent({ initialTab, pokemon, friends, pokedexUn
                   >
                     COLLECTION
                   </h2>
-                  <span className="font-bold text-sm text-black tracking-wide">{pokemon.length} / 151</span>
+                  <span className="font-bold text-sm text-black tracking-wide">{pokemon.length} / {user.catch_limit ?? 200}</span>
                 </div>
                 <div className="flex-1 flex flex-col pr-2 min-h-0 relative">
-                  <CollectionTab pokemon={pokemon} />
+                  <CollectionTab pokemon={pokemon} candies={candies} />
                 </div>
               </TabPanel>
             )}

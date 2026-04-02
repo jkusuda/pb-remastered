@@ -1,9 +1,9 @@
 import { useAuth } from "./hooks/useAuth";
 import { useRecentCatches } from "./hooks/useRecentCatches";
+import { WEBSITE_URL } from "./lib/constants";
 
 const SPRITE_BASE =
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated";
-const WEBSITE_URL = "http://localhost:3000";
+  "https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/versions/generation-v/black-white/animated";
 
 function getPokemonSprite(pokedexNumber: number, isShiny: boolean) {
   return isShiny
@@ -18,10 +18,15 @@ export default function App() {
   /* ── Loading ─────────────────────────────────────────────────── */
   if (loading) {
     return (
-      <div className="popup-container">
-        <div className="popup-card">
-          <h1 className="popup-title">Pokebrowser</h1>
-          <div className="spinner" />
+      <div className="w-full h-full flex items-center justify-center bg-[#9dcd9d]">
+        <div className="bg-[#e0f4d9] rounded-[8px] border-4 border-black shadow-[4px_4px_0_black] px-8 py-6 flex flex-col items-center gap-4">
+          <h1
+            className="font-black text-xl tracking-widest text-white uppercase"
+            style={{ WebkitTextStroke: "1.5px black", textShadow: "0 2px 0 black" }}
+          >
+            Pokebrowser
+          </h1>
+          <div className="w-8 h-8 rounded-full border-4 border-black/10 border-t-[#6b9fff] animate-spin" />
         </div>
       </div>
     );
@@ -30,20 +35,26 @@ export default function App() {
   /* ── Not logged in ───────────────────────────────────────────── */
   if (!user) {
     return (
-      <div className="popup-container">
-        <div className="popup-card">
-          <div className="pokeball-icon">
-            <svg viewBox="0 0 100 100" width="64" height="64">
-              <circle cx="50" cy="50" r="48" stroke="#3a5a00" strokeWidth="4" fill="none" />
-              <path d="M 2 50 L 98 50" stroke="#3a5a00" strokeWidth="4" />
-              <circle cx="50" cy="50" r="14" stroke="#3a5a00" strokeWidth="4" fill="none" />
-              <circle cx="50" cy="50" r="6" fill="#3a5a00" />
-              <path d="M 2 50 A 48 48 0 0 1 98 50 Z" fill="#3a5a00" opacity="0.15" />
-            </svg>
-          </div>
-          <h1 className="popup-title">Pokebrowser</h1>
-          <p className="popup-subtitle">Gotta catch 'em all!</p>
-          <button className="btn-primary" onClick={openLogin}>
+      <div className="w-full h-full flex flex-col p-4 bg-[#9dcd9d]" style={{
+        backgroundImage: "url('./route101.webp')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}>
+        <div className="my-auto bg-[#e0f4d9] rounded-[8px] border-4 border-black shadow-[4px_4px_0_black] p-6 flex flex-col items-center text-center">
+          <h1
+            className="font-black text-2xl tracking-widest text-white uppercase mb-4"
+            style={{ WebkitTextStroke: "1.5px black", textShadow: "0 2px 0 black" }}
+          >
+            Pokebrowser
+          </h1>
+          <p className="font-bold text-black text-[13px] leading-snug tracking-wide mb-6">
+            Pokémon appear as you browse. Catch them all!
+          </p>
+          <button
+            onClick={openLogin}
+            className="w-full py-3 bg-[#8abf8a] hover:bg-[#9dcd9d] active:bg-[#9dcd9d] text-white font-black text-[12px] tracking-widest uppercase rounded-[6px] border-4 border-black shadow-[4px_4px_0_black] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all cursor-pointer"
+            style={{ WebkitTextStroke: "0.5px black", textShadow: "0px 1px 0px black" }}
+          >
             Login / Sign Up
           </button>
         </div>
@@ -85,7 +96,7 @@ export default function App() {
           ) : catches.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <p
-                className="font-['Press_Start_2P'] text-[9px] text-[#3a5a00]/40 text-center leading-relaxed"
+                className="font-black tracking-widest uppercase text-[9px] text-[#3a5a00]/40 text-center leading-relaxed"
               >
                 NO POKÉMON YET<br />GO CATCH SOME!
               </p>
@@ -127,10 +138,9 @@ export default function App() {
       <div className="px-3 pt-2">
         <button
           onClick={openProfile}
-          className="group w-full inline-flex items-center justify-center gap-3 px-6 py-3 text-[11px] tracking-widest text-white font-black italic bg-[#6b9fff] border-4 border-black rounded-[8px] shadow-[4px_4px_0_black] transition-all duration-75 cursor-pointer uppercase hover:translate-y-px active:shadow-none"
+          className="group w-full inline-flex items-center justify-center gap-3 px-6 py-3 text-[11px] tracking-widest text-white font-black italic bg-[#9dcd9d] border-4 border-black rounded-[8px] shadow-[4px_4px_0_black] transition-all duration-75 cursor-pointer uppercase hover:translate-y-px active:shadow-none"
+          style={{ WebkitTextStroke: "0.5px black", textShadow: "0px 1px 0px black" }}
         >
-          {/* Pokeball icon matching landing hero */}
-          <svg width="16" height="16" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="48" stroke="white" strokeWidth="8" fill="none"/><path d="M 2 50 L 98 50" stroke="white" strokeWidth="8"/><circle cx="50" cy="50" r="14" stroke="white" strokeWidth="8" fill="none"/><circle cx="50" cy="50" r="6" fill="white"/></svg>
           VIEW PROFILE
         </button>
       </div>

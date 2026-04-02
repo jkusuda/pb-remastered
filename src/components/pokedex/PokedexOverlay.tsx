@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { getPokedexSprite, getPokemonSprite, getPokemonInfo } from "@/lib/pokemon";
-import { Pokemon, PokemonInfo, PokedexUnlock } from "@/types";
+import { useState, useMemo } from "react";
+import { getPokedexSprite, getPokemonSprite, getPokemonData, getPokemonName } from "@/lib/pokemon";
+import { Pokemon, PokedexUnlock } from "@/types";
 import { TYPE_COLORS } from "@/lib/types";
-
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface PokedexEntry {
   id: number;
@@ -28,8 +26,6 @@ export interface PokedexEntry {
   };
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
 const STAT_COLORS: Record<string, string> = {
   hp: "#FF5959", atk: "#F5AC78", def: "#FAE078",
   spAtk: "#9DB7F5", spDef: "#A7DB8D", speed: "#FA92B2",
@@ -38,10 +34,6 @@ const STAT_COLORS: Record<string, string> = {
 const STAT_MAX: Record<string, number> = {
   hp: 255, atk: 255, def: 255, spAtk: 255, spDef: 255, speed: 255,
 };
-
-// No more mock data here
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function StatBar({ label, value, statKey }: { label: string; value: number; statKey: string }) {
   const max = STAT_MAX[statKey] ?? 255;
@@ -111,7 +103,6 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
   const name = entry.isCaught ? entry.name.replace(/-/g, " ").toUpperCase() : "???";
 
   return (
-    // Detail panel fills its parent column — no scroll here
     <div className="flex flex-col h-full bg-[#3a96b6]">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-2.5 bg-[#74eaf0] border-b-4 border-[#3a96b6] shrink-0">
@@ -156,7 +147,7 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
         )}
       </div>
 
-      {/* Content Area — fills remaining height, no scroll */}
+      {/* Content Area */}
       <div className="flex-1 p-3 bg-[#44b3c8]/10 flex flex-col">
         {activeTab === "stats" ? (
           entry.isCaught && entry.baseStats ? (
@@ -199,7 +190,7 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
           <div className="flex flex-col items-center justify-center h-full gap-2">
             {entry.isCaught ? (
               <div className="text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] font-black tracking-widest uppercase text-[8px] leading-relaxed text-center px-2">
-                {entry.description || "Loading description..."}
+                {entry.description || "No description available."}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full gap-2 opacity-40">
@@ -238,8 +229,6 @@ function DetailPanel({ entry }: { entry: PokedexEntry }) {
   );
 }
 
-// ─── Left Panel (static shell + scrollable grid) ──────────────────────────────
-
 function LeftPanel({
   entries,
   filtered,
@@ -260,10 +249,7 @@ function LeftPanel({
   onSelect: (id: number) => void;
 }) {
   return (
-    // This column is a fixed flex column — only the grid div scrolls
     <div className="flex flex-col bg-[#3a96b6] border-r-4 border-[#364d4e]" style={{ width: "65%" }}>
-
-      {/* ── Static: caught counter ── */}
       <div className="shrink-0 flex items-center justify-end px-3 py-2 bg-[#3a96b6] border-b-2 border-[#364d4e]">
         <div className="flex items-center gap-1 font-black tracking-widest uppercase text-[7px] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
           <div className="w-3 h-3 rounded-full border border-white/60 bg-linear-to-b from-red-500 from-50% to-white to-50% mr-1" />
@@ -273,7 +259,6 @@ function LeftPanel({
         </div>
       </div>
 
-      {/* ── Static: search bar ── */}
       <div className="shrink-0 px-2 py-2 bg-[#3a96b6] border-b-2 border-[#364d4e]">
         <div className="relative">
           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[#4a7aaa] text-sm">🔍</span>
@@ -287,7 +272,6 @@ function LeftPanel({
         </div>
       </div>
 
-      {/* ── Scrollable: grid only ── */}
       <div className="flex-1 min-h-0 overflow-y-auto p-2 custom-scrollbar bg-[#5ecddb]">
         <div className="grid grid-cols-6 gap-1.5">
           {filtered.map((entry) => (
@@ -309,8 +293,6 @@ function LeftPanel({
   );
 }
 
-// ─── Main Overlay ─────────────────────────────────────────────────────────────
-
 interface PokedexOverlayProps {
   pokemon?: Pokemon[];
   pokedexUnlocks?: PokedexUnlock[];
@@ -319,29 +301,28 @@ interface PokedexOverlayProps {
 export function PokedexOverlay({ pokemon = [], pokedexUnlocks = [] }: PokedexOverlayProps) {
   const [selectedId, setSelectedId] = useState(1);
   const [search, setSearch] = useState("");
-  const [fetchedDetails, setFetchedDetails] = useState<Record<number, PokemonInfo>>({});
 
-  // Use pokedex unlocks size for the total caught count if available, otherwise fallback to unique pokemon owned
   const caught = pokedexUnlocks.length > 0
     ? pokedexUnlocks.length
     : new Set(pokemon.map((p) => p.pokedex_number)).size;
   const total = 151;
 
+  // All entries built synchronously from static data — no fetching needed
   const entries = useMemo(() => {
     return Array.from({ length: total }, (_, i) => {
       const id = i + 1;
       const caughtRecord = pokemon.find((p) => p.pokedex_number === id);
       const isUnlocked = pokedexUnlocks.some((u) => u.pokedex_number === id);
       const isCaught = isUnlocked || !!caughtRecord;
-      const details = fetchedDetails[id];
+      const data = getPokemonData(id);
 
       return {
         id,
-        name: details ? details.name : `pokemon-${id}`,
+        name: data ? getPokemonName(id) : `pokemon-${id}`,
         isCaught,
-        types: details ? details.types : undefined,
-        baseStats: details ? details.baseStats : undefined,
-        description: details ? details.description : undefined,
+        types: data ? data.types : undefined,
+        baseStats: data ? data.baseStats : undefined,
+        description: data ? data.description : undefined,
         caughtData: caughtRecord ? {
           is_shiny: caughtRecord.is_shiny,
           caught_at: caughtRecord.caught_at,
@@ -349,21 +330,7 @@ export function PokedexOverlay({ pokemon = [], pokedexUnlocks = [] }: PokedexOve
         } : undefined,
       };
     });
-  }, [pokemon, pokedexUnlocks, fetchedDetails]);
-
-  // Fetch details for selected pokemon if caught and not yet fetched.
-  // fetchedDetails is intentionally excluded from deps: the guard inside
-  // (`!fetchedDetails[selectedId]`) prevents duplicate fetches without
-  // needing to re-run the effect every time a new entry is cached.
-  useEffect(() => {
-    const selectedRecord = pokemon.find(p => p.pokedex_number === selectedId);
-    if (selectedRecord && !fetchedDetails[selectedId]) {
-      getPokemonInfo(selectedId)
-        .then(info => setFetchedDetails(prev => ({ ...prev, [selectedId]: info })))
-        .catch(console.error);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId, pokemon]);
+  }, [pokemon, pokedexUnlocks]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -379,18 +346,11 @@ export function PokedexOverlay({ pokemon = [], pokedexUnlocks = [] }: PokedexOve
   const selectedEntry = entries.find((e) => e.id === selectedId) ?? entries[0];
 
   return (
-    /*
-     * Outer wrapper: px/pt/pb create the visible margin around the device frame.
-     * It does NOT scroll — the page/parent is responsible for its own height.
-     * The inner frame is a fixed-height flex column; only the grid inside scrolls.
-     */
     <div className="w-full px-1 pt-4 pb-2">
-      {/* ── Device frame ── */}
       <div
         className="flex flex-col rounded-[8px] border-4 border-[#364d4e] shadow-[4px_4px_0_#364d4e] overflow-hidden"
-        style={{ height: 560 }}   /* fixed height keeps bottom margin always visible */
+        style={{ height: 560 }}
       >
-        {/* ── Body: left (grid) + right (detail), both static in height ── */}
         <div className="flex flex-1 min-h-0">
           <LeftPanel
             entries={entries}
@@ -403,7 +363,6 @@ export function PokedexOverlay({ pokemon = [], pokedexUnlocks = [] }: PokedexOve
             onSelect={setSelectedId}
           />
 
-          {/* Right panel: completely static, no scroll */}
           <div className="flex flex-col flex-1 min-h-0 bg-[#44b3c8] border-l-2 border-[#364d4e]">
             <DetailPanel entry={selectedEntry!} />
           </div>

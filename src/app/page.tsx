@@ -97,17 +97,6 @@ async function HomeContent({
             Pokémon appear as you browse. Catch them all!
           </p>
 
-          {/* <Link
-            href="/download"
-            className="mt-8 group inline-flex items-center gap-3 px-8 py-4 md:px-12 md:py-5 text-[15px] md:text-lg font-black tracking-widest text-[#fdfaf6] bg-[#6b9fff] border-4 border-black rounded-[8px] shadow-[6px_6px_0_black] transition-all duration-75 no-underline hover:translate-y-px active:shadow-[2px_2px_0_black] uppercase"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            GET POKEBROWSER
-          </Link> */}
         </div>
 
         {/* Scroll Indicator */}

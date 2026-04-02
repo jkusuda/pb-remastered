@@ -15,6 +15,7 @@ export default async function ProfilePage() {
     friends,
     pokedexUnlocks,
     favoritePokemon,
+    candies,
   } = await getTrainerData(supabase, authUser.id);
 
   if (!userData) redirect("/?modal=login");
@@ -32,6 +33,7 @@ export default async function ProfilePage() {
         pokedexUnlocks={pokedexUnlocks}
         user={userData}
         favoritePokemon={favoritePokemon}
+        candies={candies}
       />
     </div>
   );

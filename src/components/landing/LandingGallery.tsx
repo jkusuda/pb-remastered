@@ -7,7 +7,6 @@ import gallery2 from "@/assets/gallery2.png";
 import gallery3 from "@/assets/gallery3.png";
 
 const IMAGES = [gallery1, gallery2, gallery3];
-// Generate a massive array of images (90 images) so the scroll feels truly infinite
 const INFINITE_IMAGES = Array(30).fill(IMAGES).flat();
 
 export default function LandingGallery() {
@@ -16,24 +15,18 @@ export default function LandingGallery() {
 
   useEffect(() => {
     if (scrollRef.current && scrollRef.current.children.length > 0) {
-      // Find the middle element and snap precisely to its left edge on mount
+      // Snap to the middle element on mount
       const middleIndex = Math.floor(INFINITE_IMAGES.length / 2);
       const middleItem = scrollRef.current.children[middleIndex] as HTMLElement;
-      
-      const containerLeft = scrollRef.current.offsetLeft;
-      const itemLeft = middleItem.offsetLeft;
-      
-      // We subtract containerLeft to correctly handle relative parent offsets
-      scrollRef.current.scrollLeft = itemLeft - containerLeft;
-      
-      // Delay mounting slightly to ensure layout repaints before showing
+      scrollRef.current.scrollLeft = middleItem.offsetLeft - scrollRef.current.offsetLeft;
+
       setTimeout(() => setMounted(true), 50);
     }
   }, []);
 
   const getScrollAmount = () => {
     if (!scrollRef.current || !scrollRef.current.firstElementChild) return 700;
-    // Calculate precise width of an individual gallery item plus the gap (gap-8 = 32px)
+    // Item width + gap (gap-8 = 32px)
     return (scrollRef.current.firstElementChild as HTMLElement).offsetWidth + 32;
   };
 

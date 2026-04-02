@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-const TRAINER_BASE = "https://play.pokemonshowdown.com/sprites/trainers";
+import { TRAINER_BASE } from "@/lib/pokemon";
 
 const AVATAR_OPTIONS = [
   "ash", "red", "ethan", "lyra", "kris", "brendan", "may", "lucas", "dawn", "hilbert", "hilda",
@@ -22,7 +21,6 @@ export default function EditProfileModal({ currentName, currentAvatarId, onClose
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
 
   async function handleSave() {
     setLoading(true);

@@ -1,6 +1,5 @@
 import { Friend, User } from "@/types";
-
-const TRAINER_BASE = "https://play.pokemonshowdown.com/sprites/trainers";
+import { TRAINER_BASE } from "@/lib/pokemon";
 
 type FriendWithUser = Friend & { friend: Pick<User, "trainer_name" | "avatar_id" | "level"> };
 

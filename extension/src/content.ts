@@ -1,22 +1,461 @@
-// Content script injected on all website pages.
-// Listens for postMessage events from ExtensionAuthBridge (on every page)
-// and from login/page.tsx (on the login page), then relays them to the
-// extension's background service worker.
-
+// --- Authentication Relay ---
+// Listens for postMessage events from the main web application and relays session tokens
+// to the extension's background script to keep them synchronized.
 window.addEventListener("message", (event) => {
   if (event.source !== window) return;
 
-  if (event.data?.type === "POKEBROWSE_AUTH_SUCCESS") {
-    const { access_token, refresh_token } = event.data.payload ?? {};
-    if (access_token && refresh_token) {
-      chrome.runtime.sendMessage({
-        type: "POKEBROWSE_AUTH_TOKENS",
-        payload: { access_token, refresh_token },
-      });
+  try {
+    if (event.data?.type === "POKEBROWSE_AUTH_SUCCESS") {
+      const { access_token, refresh_token } = event.data.payload ?? {};
+      if (access_token && refresh_token) {
+        chrome.runtime.sendMessage({
+          type: "POKEBROWSE_AUTH_TOKENS",
+          payload: { access_token, refresh_token },
+        });
+      }
+    }
+
+    if (event.data?.type === "POKEBROWSE_AUTH_SIGNOUT") {
+      chrome.runtime.sendMessage({ type: "POKEBROWSE_AUTH_SIGNOUT" });
+    }
+  } catch (e) {
+    // Debug hint: If tokens aren't sinking, the extension may have updated or reloaded recently.
+    console.debug("Pokebrowser: Extension context invalidated. Please reload the page.");
+  }
+});
+
+// --- Encounter Config ---
+const ENCOUNTER_CHANCE = 1.0;
+const SPRITE_BASE =
+  "https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/versions/generation-v/black-white/animated";
+
+
+function getSpriteUrl(pokedexNumber: number, isShiny: boolean) {
+  return isShiny
+    ? `${SPRITE_BASE}/shiny/${pokedexNumber}.gif`
+    : `${SPRITE_BASE}/${pokedexNumber}.gif`;
+}
+
+// Animation Utilities
+
+function animEnd(el: Element): Promise<void> {
+  return new Promise((resolve) => el.addEventListener("animationend", () => resolve(), { once: true }));
+}
+
+// Resets and plays a CSS animation string on an element.
+function playCSS(el: HTMLElement, animation: string): Promise<void> {
+  el.style.animation = "none";
+  void el.offsetWidth;
+  el.style.animation = animation;
+  return animEnd(el);
+}
+
+// Steps through Y-offsets over a single sprite column layout.
+function frameTicker(
+  el: HTMLElement,
+  yOffsets: number[],
+  fps: number
+): Promise<void> {
+  return new Promise((resolve) => {
+    let i = 0;
+    const ms = 1000 / fps;
+    const tick = () => {
+      el.style.backgroundPosition = `0px ${yOffsets[i]}px`;
+      if (++i >= yOffsets.length) return resolve();
+      setTimeout(tick, ms);
+    };
+    tick();
+  });
+}
+
+// Spritesheet vertical layout definitions (Y-offsets).
+// Based on drawing 64x64px frames from a 1792x2048px original sheet.
+const PB_FRAME = {
+  spin: [0, -64, -128],
+  flash: [-192, -256, -320],
+  closed: [0],
+  shake: [-960, -1024, -1088, -1152, -1216],
+  success: [-1728, -1792, -1856, -1920, -1984],
+};
+
+async function runCatchAnimation(
+  pokeballEl: HTMLElement,
+  pokemonImg: HTMLElement
+): Promise<void> {
+  // Throw. Play CSS arc geometry and sprite spinning simultaneously.
+  pokeballEl.style.opacity = "1";
+  const throwArc = playCSS(pokeballEl, "pb-throw 0.8s ease-out forwards");
+
+  await frameTicker(pokeballEl, [...PB_FRAME.spin, ...PB_FRAME.spin, ...PB_FRAME.spin], 10);
+  await throwArc;
+
+  // Absorb. Bright white flash, make the pokemon image fade, then close.
+  pokeballEl.style.filter = "brightness(3) drop-shadow(0 0 20px white)";
+  await frameTicker(pokeballEl, PB_FRAME.flash, 8);
+  pokemonImg.style.opacity = "0";
+  pokeballEl.style.filter = "";
+  await frameTicker(pokeballEl, PB_FRAME.closed, 8);
+  await new Promise<void>((r) => setTimeout(r, 100));
+
+  // Shake loops.
+  for (let s = 0; s < 3; s++) {
+    const shakeDuration = 0.45 + s * 0.05;
+    const shakeArc = playCSS(pokeballEl, `pb-shake ${shakeDuration}s ease-in-out`);
+    await frameTicker(pokeballEl, PB_FRAME.shake, 10);
+    await shakeArc;
+    await frameTicker(pokeballEl, PB_FRAME.closed, 8);
+    await new Promise<void>((r) => setTimeout(r, 200));
+  }
+
+  // Confirmation sparkles.
+  pokeballEl.style.filter = "drop-shadow(0 0 8px rgba(255,255,255,0.6))";
+  await frameTicker(pokeballEl, PB_FRAME.success, 8);
+  await playCSS(pokeballEl, "pb-success 0.4s ease-out forwards");
+  pokeballEl.style.filter = "";
+}
+
+// Popup Styling
+function getPopupCSS(grassUrl: string, pokeballUrl: string) {
+  return `
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400..900&display=swap");
+
+    :host {
+      all: initial;
+      font-family: "Outfit", sans-serif;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 2147483647;
+      pointer-events: none;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(120%); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideOutRight {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(120%); }
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    /* ── Pokeball animation keyframes ── */
+
+    @keyframes pb-throw {
+      0%   { transform: translate(50px, 10px) scale(0.8); }
+      50%  { transform: translate(25px, -50px) scale(1.5); }
+      100% { transform: translate(0px, 0px) scale(2); }
+    }
+
+    @keyframes pb-shake {
+      0%   { transform: scale(2) rotate(0deg); }
+      20%  { transform: scale(2) rotate(-12deg); }
+      40%  { transform: scale(2) rotate(12deg); }
+      60%  { transform: scale(2) rotate(-8deg); }
+      80%  { transform: scale(2) rotate(8deg); }
+      100% { transform: scale(2) rotate(0deg); }
+    }
+
+    @keyframes pb-success {
+      0%   { transform: scale(2); }
+      40%  { transform: scale(2.6); }
+      70%  { transform: scale(1.9); }
+      100% { transform: scale(2); }
+    }
+
+    .card {
+      background: #e0f4d9;
+      border: 4px solid black;
+      border-radius: 12px;
+      box-shadow: 6px 6px 0 black;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 220px;
+      pointer-events: all;
+      animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .card.dismissing {
+      animation: slideOutRight 0.3s ease-in forwards;
+    }
+
+    .title {
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: white;
+      -webkit-text-stroke: 1.2px black;
+      text-shadow: 0 2px 0 black;
+      text-align: center;
+    }
+
+    .sprite-area {
+      position: relative;
+      width: 220px;
+      height: 100px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .sprite-area img.pokemon {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      position: absolute;
+      bottom: 22px;
+      z-index: 2;
+      transition: opacity 0.15s ease;
+    }
+
+    .sprite-area .grass {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px;
+      height: 64px;
+      background: url("${grassUrl}") center / contain no-repeat;
+      image-rendering: pixelated;
+      z-index: 1;
+    }
+
+    /* Pokeball canvas — sits in the sprite-area during catch animation */
+    .pokeball-canvas {
+      position: absolute;
+      bottom: 20px;
+      left: calc(50% - 32px);
+      width: 64px;
+      height: 64px;
+      image-rendering: pixelated;
+      background: url("${pokeballUrl}") no-repeat;
+      background-size: 1792px 2048px;
+      background-position: 0 0;
+      opacity: 0;
+      z-index: 3;
+      transform: scale(2);
+    }
+
+    .shiny-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 16px;
+      color: #f59e0b;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+      animation: sparkle 1.2s ease-in-out infinite;
+      z-index: 4;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px 0;
+      font-family: "Outfit", sans-serif;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: white;
+      -webkit-text-stroke: 0.5px black;
+      text-shadow: 0 1px 0 black;
+      border: 3px solid black;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 75ms;
+      box-shadow: 3px 3px 0 black;
+    }
+
+    .btn:active {
+      box-shadow: none;
+      transform: translate(3px, 3px);
+    }
+
+    .btn-catch {
+      background: #8abf8a;
+    }
+    .btn-catch:hover {
+      background: #9dcd9d;
+    }
+
+    .btn-run {
+      background: #c0392b;
+    }
+    .btn-run:hover {
+      background: #e74c3c;
+    }
+
+    .catch-result {
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: white;
+      -webkit-text-stroke: 1px black;
+      text-shadow: 0 2px 0 black;
+      text-align: center;
+      width: 100%;
+    }
+  `;
+}
+
+// Encounter UI Logic
+function showEncounterPopup(
+  encounter: { pokedexNumber: number; isShiny: boolean; name: string },
+  userId: string,
+  boxIsFull: boolean
+) {
+  if (document.getElementById("pokebrowse-encounter")) return;
+
+  const host = document.createElement("div");
+  host.id = "pokebrowse-encounter";
+  document.body.appendChild(host);
+
+  const shadow = host.attachShadow({ mode: "closed" });
+
+  let grassUrl = "";
+  let pokeballUrl = "";
+  try {
+    grassUrl = chrome.runtime.getURL("grass-platform.webp");
+    pokeballUrl = chrome.runtime.getURL("pokeball-spritesheet.png");
+  } catch (e) {
+    console.debug("Pokebrowser: Extension context invalidated.");
+    return;
+  }
+
+  const style = document.createElement("style");
+  style.textContent = getPopupCSS(grassUrl, pokeballUrl);
+  shadow.appendChild(style);
+
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.innerHTML = `
+    <div class="card">
+      <div class="title">A wild ${encounter.name} appeared!</div>
+      <div class="sprite-area">
+        ${encounter.isShiny ? '<span class="shiny-badge">✦</span>' : ""}
+        <img class="pokemon" src="${getSpriteUrl(encounter.pokedexNumber, encounter.isShiny)}" alt="${encounter.name}" />
+        <div class="pokeball-canvas"></div>
+        <div class="grass"></div>
+      </div>
+      ${boxIsFull ? `
+        <div class="title" style="margin-top: 8px; color: #ff8a8a; -webkit-text-stroke: 1px black;">Your box is full!</div>
+        <div class="buttons">
+          <button class="btn btn-run" id="run-btn">Run</button>
+        </div>
+      ` : `
+        <div class="buttons">
+          <button class="btn btn-catch" id="catch-btn">Catch</button>
+          <button class="btn btn-run" id="run-btn">Run</button>
+        </div>
+      `}
+    </div>
+  `;
+  shadow.appendChild(overlay);
+
+  const runBtn = shadow.getElementById("run-btn")!;
+  const catchBtn = shadow.getElementById("catch-btn");
+
+  function dismiss() {
+    const card = shadow.querySelector(".card");
+    if (card) {
+      card.classList.add("dismissing");
+      setTimeout(() => host.remove(), 300);
+    } else {
+      host.remove();
     }
   }
 
-  if (event.data?.type === "POKEBROWSE_AUTH_SIGNOUT") {
-    chrome.runtime.sendMessage({ type: "POKEBROWSE_AUTH_SIGNOUT" });
+  runBtn.addEventListener("click", dismiss);
+
+  if (catchBtn) {
+    catchBtn.addEventListener("click", () => {
+      // Lock both inputs immediately to prevent duplicate network calls.
+      catchBtn.setAttribute("disabled", "true");
+      runBtn.setAttribute("disabled", "true");
+
+      const pokemonImg = shadow.querySelector(".pokemon") as HTMLElement;
+      const pokeballEl = shadow.querySelector(".pokeball-canvas") as HTMLElement;
+      const buttonsDiv = shadow.querySelector(".buttons") as HTMLElement;
+
+      // Trigger visual sequence before executing network request
+      runCatchAnimation(pokeballEl, pokemonImg).then(() => {
+        try {
+          chrome.runtime.sendMessage(
+            {
+              type: "PERFORM_CATCH",
+              payload: {
+                userId,
+                pokedexNumber: encounter.pokedexNumber,
+                isShiny: encounter.isShiny,
+                name: encounter.name,
+                caughtOn: window.location.hostname,
+              },
+            },
+            (response) => {
+              const resultEl = document.createElement("div");
+              resultEl.className = "catch-result";
+
+              if (response?.ok) {
+                resultEl.textContent = `Gotcha! ${encounter.name} was caught!`;
+              } else {
+                resultEl.textContent = response?.error === "CATCH_LIMIT_REACHED" 
+                  ? "Box is full!" 
+                  : "Something went wrong...";
+              }
+
+              buttonsDiv.innerHTML = "";
+              buttonsDiv.appendChild(resultEl);
+
+              setTimeout(() => dismiss(), 2000);
+            }
+          );
+        } catch (e) {
+          console.debug("Pokebrowser: Extension context invalidated.");
+          buttonsDiv.innerHTML = "";
+          buttonsDiv.textContent = "Extension reloaded. Please refresh the page.";
+          setTimeout(() => host.remove(), 2000);
+        }
+      });
+    });
   }
-});
+}
+
+// Extension Initialization
+async function tryEncounter() {
+  if (Math.random() > ENCOUNTER_CHANCE) return;
+
+  try {
+    const session: any = await chrome.runtime.sendMessage({ type: "GET_SESSION" });
+    if (!session?.loggedIn || !session.encounter) return;
+
+    setTimeout(() => {
+      showEncounterPopup(session.encounter, session.userId, !!session.boxIsFull);
+    }, 1500);
+  } catch (e) {
+    console.debug("Pokebrowser: Extension context invalidated.");
+  }
+}
+
+if (!window.location.href.startsWith("http://localhost:3000")) {
+  tryEncounter();
+}

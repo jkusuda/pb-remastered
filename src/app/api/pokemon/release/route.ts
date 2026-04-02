@@ -15,19 +15,19 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { pokemonId } = body;
 
-    const { data: pokemon } = await supabase
-        .from("pokemon")
-        .select("id")
-        .eq("id", pokemonId)
-        .eq("user_id", user.id)
-        .single();
-    
-    if (!pokemon) {
-        return NextResponse.json({ error: "Pokemon not found or not owned by user" }, { status: 403 });
+    if (!pokemonId) {
+      return NextResponse.json({ error: "Missing pokemonId" }, { status: 400 });
     }
 
-    if (!pokemonId) {
-       return NextResponse.json({ error: "Missing pokemonId" }, { status: 400 });
+    const { data: pokemon } = await supabase
+      .from("pokemon")
+      .select("id")
+      .eq("id", pokemonId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (!pokemon) {
+      return NextResponse.json({ error: "Pokemon not found or not owned by user" }, { status: 403 });
     }
 
     await releasePokemon(supabase, pokemonId);

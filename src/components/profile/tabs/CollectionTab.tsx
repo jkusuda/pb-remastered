@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Pokemon, PokemonInfo } from "@/types";
-import { getPokemonSprite, getPokemonInfo } from "@/lib/pokemon";
+import { Pokemon, PokemonInfo, Candy } from "@/types";
+import { getPokemonSprite, getPokemonData, getFamilyId } from "@/lib/pokemon";
 import PokemonDetailsPanel from "./PokemonDetailsPanel";
 
 const PANEL_TRANSITION_MS = 300;
 
-export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
+export default function CollectionTab({ pokemon, candies }: { pokemon: Pokemon[], candies: Candy[] }) {
   const [displayPokemon, setDisplayPokemon] = useState<Pokemon | null>(null);
   const [isPanelVisible, setIsPanelVisible] = useState(false);
-  const [infoCache, setInfoCache] = useState<Record<number, PokemonInfo>>({});
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; pokemon: Pokemon } | null>(null);
 
   const router = useRouter();
@@ -20,20 +19,8 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
-  // Fetch PokeAPI data whenever the displayed pokemon changes
-  useEffect(() => {
-    if (!displayPokemon) return;
-    const dexNum = displayPokemon.pokedex_number;
-    if (infoCache[dexNum]) return; // already cached
-    getPokemonInfo(dexNum)
-      .then((info) => setInfoCache((prev) => ({ ...prev, [dexNum]: info })))
-      .catch(console.error);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [displayPokemon?.pokedex_number]);
-
   const handleSelect = (p: Pokemon) => {
     if (displayPokemon && displayPokemon.id !== p.id && isPanelVisible) {
-      // Different pokemon clicked while open: slide out, swap, slide in
       setIsPanelVisible(false);
       setTimeout(() => {
         setDisplayPokemon(p);
@@ -56,23 +43,14 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
   };
 
   const handleChangeNickname = async (p: Pokemon) => {
-    const currentName = p.nickname || "this Pokémon";
+    const info = getPokemonData(p.pokedex_number);
+    const currentName = p.nickname || info?.name || "this Pokémon";
     const newNick = window.prompt(`Enter a new nickname for ${currentName} (leave blank for default name):`, p.nickname || "");
     if (newNick !== null) {
       let finalNick = newNick.trim();
 
       if (!finalNick) {
-        let defaultName = infoCache[p.pokedex_number]?.name;
-        if (!defaultName) {
-          try {
-            const info = await getPokemonInfo(p.pokedex_number);
-            defaultName = info.name;
-            setInfoCache((prev) => ({ ...prev, [p.pokedex_number]: info }));
-          } catch (err) {
-            console.error(err);
-            defaultName = `Pokemon #${p.pokedex_number}`;
-          }
-        }
+        const defaultName = info?.name ?? `Pokemon #${p.pokedex_number}`;
         finalNick = defaultName.charAt(0).toUpperCase() + defaultName.slice(1);
       }
 
@@ -117,6 +95,11 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
     }
   };
 
+  // Synchronous lookups — no network calls needed
+  const pokemonInfo = displayPokemon ? getPokemonData(displayPokemon.pokedex_number) : null;
+  const familyId = displayPokemon ? getFamilyId(displayPokemon.pokedex_number) : null;
+  const familyInfo = familyId !== null ? getPokemonData(familyId) : null;
+
   if (pokemon.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -159,7 +142,9 @@ export default function CollectionTab({ pokemon }: { pokemon: Pokemon[] }) {
 
       <PokemonDetailsPanel
         pokemon={displayPokemon}
-        pokemonInfo={displayPokemon ? infoCache[displayPokemon.pokedex_number] ?? null : null}
+        pokemonInfo={pokemonInfo as PokemonInfo | null}
+        familyInfo={familyInfo as PokemonInfo | null}
+        candies={candies}
         isVisible={isPanelVisible}
         onClose={handleClose}
       />

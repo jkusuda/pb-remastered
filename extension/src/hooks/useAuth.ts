@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
+import { WEBSITE_URL, SESSION_KEY } from "../lib/constants";
 import type { User } from "@supabase/supabase-js";
-
-const WEBSITE_URL = "http://localhost:3000";
-const SESSION_KEY = "pb_session";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
